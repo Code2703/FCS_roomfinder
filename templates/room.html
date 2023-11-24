@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Room-Details
+{% endblock %}
+
+<!-- START ADDING YOUR CONTENT HERE -->
+{% block main %}
+<!-- You can add Python commands through Jinja2 (if you want to look it up on Google) -->
+<div>
+    <!-- Whole python expressions (like loops or if-else statements) take the following format: -->
+    {% for el in my_variable %}
+    
+        <!-- Single variables can be inserted as follows into your HTML code (note: no percent signs but double brackets!): -->
+        <div>{{ el }}</div>
+    
+        <!-- Remember to close the loop as follows -->
+    {% endfor %}
+</div>
+{% endblock %}

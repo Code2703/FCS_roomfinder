@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+
+
+{% block title %}
+Home
+{% endblock %}
+
+
+
+{% block main %}
+    
+    <div>
+        <p></p>
+    </div>
+    
+    
+    <div>
+        <form action="" method="post">
+
+            <!-- Filter by size -->
+            <input type="text" autofocus autocomplete="off" name="filter_size" placeholder="Maximum Size"><br><br>
+            
+            <!-- Filter by availability -->
+            <input type="checkbox" name="filter_available"></input>
+            <label for="filter_available">Only show available rooms</label><br><br>
+            
+            <!-- Time selector element -->
+            <label for="filter_time">Select a Time</label>
+            <select name="filter_time">
+              <option value="">--Please choose an option--</option>
+              <option value="08:15">08:15</option>
+              <option value="10:15">10:15</option>
+              <option value="12:15">12:15</option>
+              <option value="14:15">14:15</option>
+              <option value="16:15">16:15</option>
+              <option value="18:15">18:15</option>
+              <option value="20:15">20:15</option>
+            </select>
+
+            <button type="submit" name="button_filter_size">Filter</button>
+        </form>
+    </div>
+
+    <div>
+        <p></p>
+    </div>
+
+    {% for index, room_nr, size, start_time, end_time, subject, start_time_only, end_time_only in rooms_df.itertuples() %}
+        <div style="width: 500px; border: 2px solid grey; padding-left: 50px; padding-top: 20px; padding-bottom: 20px; margin-top: 20px;">
+            <h5>Room: {{ room_nr }}</h5>
+            <h6>Size: {{ size }}</h6>
+            <h6>{{ start_time.strftime(format="%H:%M") }} - {{ end_time.strftime(format="%H:%M") }}</h6>
+                <ul>
+                    <li>
+                        {{ subject }}
+                    </li>
+                </ul>
+        </div>
+    {% endfor %}
+
+{% endblock %}
