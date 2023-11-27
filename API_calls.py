@@ -137,7 +137,7 @@ class API:
 
         if filter_end != None:
             filter_end = dt.strptime(filter_end, '%H:%M').time()
-            occupied = merged_df.query("start_time.dt.time <= @filter_start and end_time.dt.time <= @filter_end").room_nr.unique()
+            occupied = merged_df.query("(start_time.dt.time < @filter_end) and (end_time.dt.time > @filter_start)").room_nr.unique()
             free_rooms = list(filter(lambda x: x not in occupied, rooms['room_nr']))
             filtered_dfs = []
             for room in free_rooms:
@@ -145,22 +145,9 @@ class API:
                 filtered_dfs.append(filtered_df)
 
             result_df = pd.concat(filtered_dfs)
-
-            result_df.replace(np.nan, None, inplace=True)
-            
-            # Define placeholders for NaT entries
-            placeholder_datetime = pd.to_datetime('1970-01-01 00:00:00')
-
-            # Replace NaT and NaN values with placeholders, resp. None
-            result_df.replace(np.nan, None, inplace=True)
-            result_df['start_time'] = result_df['start_time'].fillna(placeholder_datetime)
-            result_df['end_time'] = result_df['end_time'].fillna(placeholder_datetime)
-            result_df['date'] = result_df['date'].fillna(placeholder_datetime)
-
-            return result_df
         
         else:
-            occupied = merged_df.query("start_time.dt.time <= @filter_start and end_time.dt.time >= @filter_start").room_nr.unique()
+            occupied = merged_df.query("(start_time.dt.time <= @filter_start) and (end_time.dt.time > @filter_start)").room_nr.unique()
             free_rooms = list(filter(lambda x: x not in occupied, rooms['room_nr']))
             filtered_dfs = []
             for room in free_rooms:
@@ -169,13 +156,13 @@ class API:
 
             result_df = pd.concat(filtered_dfs)
 
-            # Define placeholders for NaT entries
-            placeholder_datetime = pd.to_datetime('1970-01-01 00:00:00')
+        # Define placeholders for NaT entries
+        placeholder_datetime = pd.to_datetime('1970-01-01 00:00:00')
 
-            # Replace NaT and NaN values with placeholders, resp. None
-            result_df.replace(np.nan, None, inplace=True)
-            result_df['start_time'] = result_df['start_time'].fillna(placeholder_datetime)
-            result_df['end_time'] = result_df['end_time'].fillna(placeholder_datetime)
-            result_df['date'] = result_df['date'].fillna(placeholder_datetime)
+        # Replace NaT and NaN values with placeholders, resp. None
+        result_df.replace(np.nan, None, inplace=True)
+        result_df['start_time'] = result_df['start_time'].fillna(placeholder_datetime)
+        result_df['end_time'] = result_df['end_time'].fillna(placeholder_datetime)
+        result_df['date'] = result_df['date'].fillna(placeholder_datetime)
 
-            return result_df
+        return result_df
