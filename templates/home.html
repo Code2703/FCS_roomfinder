@@ -113,9 +113,14 @@ Home
                     </select>
                 </div>
             </div>
-            <div>
             
+            <!-- Button to clear all filters -->
+            <div>
+                <form action="{{ url_for('clear_filters') }}" method="post">
+                    <button type="submit" class="btn btn-primary">Clear Filters</button>
+                </form>                
             </div>
+
         </div>
       </div>
 

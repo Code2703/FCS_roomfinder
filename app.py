@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 import requests
 import numpy as np
 import pandas as pd
@@ -119,6 +119,13 @@ def home():
         
 
         return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf)
+
+# Route to clear filter session variables
+@app.route('/clear_filters', methods=['POST'])
+def clear_filters():
+    for key in list(session.keys()):
+        session.pop(key)
+    return redirect(url_for('home'))
 
 
 # Detailed schedule of a given room
