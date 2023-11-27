@@ -29,7 +29,7 @@ Home
                     <!-- Filter by size -->
                     <div class="col-md-4">
                         <label for="validationCustom01" class="form-label">Max. Room Size:</label>
-                        <input type="text" class="form-control" name="filter_size" value="" required>
+                        <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
                         <div class="valid-feedback">
                             Looks good!
                         </div>
@@ -40,14 +40,14 @@ Home
                         <label for="validationCustomUsername" class="form-label">From:</label>
                         <div class="input-group has-validation">
                             <select class="form-select" aria-label="Large select example" name="filter_time" required>
-                                <option value="Now" selected>Now</option>
-                                <option value="08:15">08:15</option>
-                                <option value="10:15">10:15</option>
-                                <option value="12:15">12:15</option>
-                                <option value="14:15">14:15</option>
-                                <option value="16:15">16:15</option>
-                                <option value="18:15">18:15</option>
-                                <option value="20:15">20:15</option>
+                                <option value="Now" {% if filter_time == "Now" %}selected{% endif %}>Now</option>
+                                <option value="08:15" {% if filter_time == "08:15" %}selected{% endif %}>08:15</option>
+                                <option value="10:15" {% if filter_time == "10:15" %}selected{% endif %}>10:15</option>
+                                <option value="12:15" {% if filter_time == "12:15" %}selected{% endif %}>12:15</option>
+                                <option value="14:15" {% if filter_time == "14:15" %}selected{% endif %}>14:15</option>
+                                <option value="16:15" {% if filter_time == "16:15" %}selected{% endif %}>16:15</option>
+                                <option value="18:15" {% if filter_time == "18:15" %}selected{% endif %}>18:15</option>
+                                <option value="20:15" {% if filter_time == "20:15" %}selected{% endif %}>20:15</option>
                             </select>
                             <div class="invalid-feedback">
                             Please select a start time.
@@ -60,14 +60,14 @@ Home
                         <label for="validationCustomUsername" class="form-label">Until:</label>
                         <div class="input-group has-validation">
                             <select class="form-select" aria-label="Large select example" name="filter_end_time" required>
-                                <option selected>hh:mm</option>
-                                <option value="10:00">10:00</option>
-                                <option value="12:00">12:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="16:00">16:00</option>
-                                <option value="18:00">18:00</option>
-                                <option value="20:00">20:00</option>
-                                <option value="22:00">22:00</option>
+                                <option value="{{ rounded_up_time_str }}" {% if filter_end_time == rounded_up_time_str %}selected{% endif %}>{{ rounded_up_time_str }}</option>
+                                <option value="10:00" {% if filter_end_time == "10:00" %}selected{% endif %}>10:00</option>
+                                <option value="12:00" {% if filter_end_time == "12:00" %}selected{% endif %}>12:00</option>
+                                <option value="14:00" {% if filter_end_time == "14:00" %}selected{% endif %}>14:00</option>
+                                <option value="16:00" {% if filter_end_time == "16:00" %}selected{% endif %}>16:00</option>
+                                <option value="18:00" {% if filter_end_time == "18:00" %}selected{% endif %}>18:00</option>
+                                <option value="20:00" {% if filter_end_time == "20:00" %}selected{% endif %}>20:00</option>
+                                <option value="22:00" {% if filter_end_time == "22:00" %}selected{% endif %}>22:00</option>
                             </select>
                             <div class="invalid-feedback">
                             Please select a start time.
@@ -78,7 +78,7 @@ Home
                     <!-- Filter by date -->
                     <label for="start">Date:</label>
 
-                    <input type="date" name="filter_date" value="{{ current_date }}" min="{{ current_date }}" max="{{ max_date }}" />
+                    <input type="date" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" />
                     
 
 
@@ -99,20 +99,23 @@ Home
                     </div>
                 </form>
                </div>
-          </div>
-
-          <!--Drop down to select your favorite room-->
-          <div class="col-4">
-            <div class="p-3">
-                <label for="validationCustom01" class="form-label">Select a room to view availability.</label>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>Select a room</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </select>
             </div>
-          </div>
+        
+            <!--Drop down to select your favorite room-->
+            <div class="col-4">
+                <div class="p-3">
+                    <label for="validationCustom01" class="form-label">Select a room to view availability.</label>
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected>Select a room</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+            
+            </div>
         </div>
       </div>
 

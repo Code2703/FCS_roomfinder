@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 import requests
 import numpy as np
 import pandas as pd
@@ -18,6 +18,10 @@ app.config.from_pyfile("config.py")
 # Initialize instance of API with api_token
 api = API(app.config['API_TOKEN'])
 
+# Set secret key for session variables
+app.secret_key = app.config['SECRET_KEY']
+
+
 #########################################################################################
 # WEBPAGES
 
@@ -26,16 +30,40 @@ api = API(app.config['API_TOKEN'])
 def home():
 
     # Initialize variables
-    current_time = pd.to_datetime(dt.now()).time()
+    current_time = dt.now()
     current_date = dt.now()
     max_date = current_date + timedelta(days=30)
+    min_date = current_date - timedelta(days=30)
+    
+    # Format dates as strings
     current_date = current_date.strftime("%Y-%m-%d")
     max_date = max_date.strftime("%Y-%m-%d")
+    min_date = min_date.strftime("%Y-%m-%d")
+
+    # Round up to the next full hour
+    rounded_up_time = current_time + timedelta(minutes=30)
+    rounded_up_time = rounded_up_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    rounded_up_time_str = rounded_up_time.strftime("%H:%M")
     
     # Display landing page for current time with no filters applied
     if request.method == 'GET':
+        
+        # Set default session values
+        session.setdefault('filter_time', current_time.strftime("%H:%M"))
+        session.setdefault('filter_end_time', rounded_up_time_str)
+        session.setdefault('filter_date', current_date)
+        session.setdefault('filter_size', np.inf)
+        
+            # Calculate the time that is 30 minutes ahead
+
+        # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
+        filter_size = session.get('filter_size')
+        filter_size_is_inf = filter_size == np.inf
+
+        # Retrieve specified data from API
         rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"))
-        return render_template('home.html', rooms_df=rooms_df, current_date=current_date, max_date=max_date)
+        
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str)
     
     # Apply filters and re-render template
     else:
@@ -79,10 +107,18 @@ def home():
 
         # Apply size filter
         if filter_size != np.inf:
-            rooms_df = rooms_df.query(f'size <= {filter_size}')
+            rooms_df = rooms_df.query(f'seats <= {filter_size}')
+
+        # Set session variables to store filter configuration
+        session['filter_time'] = filter_time
+        session['filter_end_time'] = filter_end_time
+        session['filter_date'] = filter_date
+        session['filter_size'] = filter_size
+
+        filter_size_is_inf = filter_size == np.inf
         
 
-        return render_template('home.html', rooms_df=rooms_df, current_date=current_date, max_date=max_date)
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf)
 
 
 # Detailed schedule of a given room

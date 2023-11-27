@@ -116,17 +116,18 @@ class API:
         return rooms_df
     
 
-    def next_event(self, df, room_nr, filter_end):
+    def next_event(self, df, room_nr, filter_end, room_info):
         room_events = df.query("room_nr == @room_nr and start_time.dt.time > @filter_end")
         if not room_events.empty:
             return room_events.sort_values(by='start_time').head(1)
         else:
             # Create a row for rooms with no more events
+            room_details = room_info.loc[room_info['room_nr'] == room_nr]
             no_event_row = pd.DataFrame({
                 'room_nr': [room_nr],
-                'id': [None],
+                'id': [room_details.iloc[0]['id']],
                 'floor': [None],
-                'seats': [None],
+                'seats': [room_details.iloc[0]['seats']],
                 'size': [None],
                 'start_time': [None],
                 'end_time': [None],
@@ -154,7 +155,7 @@ class API:
             free_rooms = list(filter(lambda x: x not in occupied, rooms['room_nr']))
             filtered_dfs = []
             for room in free_rooms:
-                filtered_df = self.next_event(merged_df, room, filter_end)
+                filtered_df = self.next_event(merged_df, room, filter_end, rooms)
                 filtered_dfs.append(filtered_df)
 
             result_df = pd.concat(filtered_dfs)
@@ -164,7 +165,7 @@ class API:
             free_rooms = list(filter(lambda x: x not in occupied, rooms['room_nr']))
             filtered_dfs = []
             for room in free_rooms:
-                filtered_df = self.next_event(merged_df, room, filter_start)
+                filtered_df = self.next_event(merged_df, room, filter_start, rooms)
                 filtered_dfs.append(filtered_df)
 
             result_df = pd.concat(filtered_dfs)
