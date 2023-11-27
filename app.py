@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import requests
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime as dt
 from API_calls import API
 
 #########################################################################################
@@ -23,37 +23,41 @@ api = API(app.config['API_TOKEN'])
 # Landing page with overview of room occupancy and filtering options
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    # Call API
-    rooms_df = api.get_courses()
 
     # Initialize variables
-    filter_size = np.inf
-    time = pd.to_datetime(datetime.now()).time()
+    current_time = pd.to_datetime(dt.now()).time()
     
     # Display landing page for current time with no filters applied
     if request.method == 'GET':
-        filtered_df = rooms_df.query(f'(size < {filter_size}) and (start_time_only < @time < end_time_only)')
-        return render_template('home.html', rooms_df=filtered_df)
+        rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"))
+        return render_template('home.html', rooms_df=rooms_df)
     
     # Apply filters and re-render template
     else:
 
         # Filter by size
         filter_size_input = request.form.get("filter_size", np.inf).strip()
-        if filter_size_input.isdigit():
-            filter_size = int(filter_size_input)
+        filter_size = int(filter_size_input) if filter_size_input.isdigit() else np.inf
         
-        # Filter by time
-        filter_time_input = request.form.get('filter_time', time)
-        filter_time = pd.to_datetime(filter_time_input, format="%H:%M").time()
+        # Filter by start-time
+        filter_time_input = request.form.get('filter_time', current_time)
+        if filter_time_input == 'Now':
+            filter_time = current_time
+        elif len(filter_time_input.split(":")) == 2 and all(part.isdigit() for part in filter_time_input.split(":")):
+            filter_time = pd.to_datetime(filter_time_input, format="%H:%M").time()
+        else:
+            filter_time = current_time
+            
+        rooms_df = api.get_free_rooms(filter_time.strftime("%H:%M"))
 
-        # Apply availability filter if checkbox is checked
-        # if request.form.get("filter_available") is not None:
-        #     rooms_df_filtered = rooms_df_filtered.query("subject == 'Free'")
-        
-        filtered_df = rooms_df.query(f'(size <= {filter_size}) and (start_time_only <= @filter_time < end_time_only)')
+        # Apply size filter
+        if filter_size != np.inf:
+            rooms_df = rooms_df.query(f'size <= {filter_size}')
+        # # Filter by end-time
+        # filter_time_input = request.form.get('filter_end_time', time)
+        # filter_time = pd.to_datetime(filter_time_input, format="%H:%M").time()
 
-        return render_template('home.html', rooms_df=filtered_df)
+        return render_template('home.html', rooms_df=rooms_df)
 
 
 # Detailed schedule of a given room

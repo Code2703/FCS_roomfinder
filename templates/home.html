@@ -28,7 +28,7 @@ Home
   
                     <!-- Filter by size -->
                     <div class="col-md-4">
-                        <label for="validationCustom01" class="form-label">Number of people?</label>
+                        <label for="validationCustom01" class="form-label">Max. Room Size:</label>
                         <input type="text" class="form-control" name="filter_size" value="" required>
                         <div class="valid-feedback">
                             Looks good!
@@ -37,10 +37,10 @@ Home
         
                     <!-- Select start time from options. COULD WE HAVE THE USER INPUT AND JUST VALIDATE THAT THE INPUT IS OK? -->    
                     <div class="col-md-4">
-                        <label for="validationCustomUsername" class="form-label">Start Time</label>
+                        <label for="validationCustomUsername" class="form-label">From:</label>
                         <div class="input-group has-validation">
                             <select class="form-select" aria-label="Large select example" name="filter_time" required>
-                                <option selected>hh:mm</option>
+                                <option value="Now" selected>Now</option>
                                 <option value="08:15">08:15</option>
                                 <option value="10:15">10:15</option>
                                 <option value="12:15">12:15</option>
@@ -57,7 +57,7 @@ Home
         
                     <!-- Select end time from options. COULD WE HAVE THE USER INPUT AND JUST VALIDATE THAT THE INPUT IS OK? -->    
                     <div class="col-md-4">
-                        <label for="validationCustomUsername" class="form-label">End Time</label>
+                        <label for="validationCustomUsername" class="form-label">Until:</label>
                         <div class="input-group has-validation">
                             <select class="form-select" aria-label="Large select example" name="filter_end_time" required>
                                 <option selected>hh:mm</option>
@@ -74,7 +74,15 @@ Home
                             </div>
                         </div>
                     </div>
-                        
+
+                    <!-- Filter by date -->
+                    <div class="col-md-4">
+                        <label class="form-label">Date:</label>
+                        <input type="text" name="filter_size">
+                    </div>
+                    
+
+
                     <!-- Filter by availability -->
                     <div class="col-8">
                         <div class="form-check">
@@ -83,13 +91,13 @@ Home
                             Only show available rooms
                             </label>
                         </div>
-                        </div>
+                    </div>
         
         
                     <!-- Submit the form -->
                     <div class="col-12">
                         <button class="btn btn-primary" type="submit" name="button_filter_size">Show me empty rooms!</button>
-                        </div>
+                    </div>
                 </form>
                </div>
           </div>
@@ -111,16 +119,33 @@ Home
 
 
 
-    {% for index, room_nr, size, start_time, end_time, subject, start_time_only, end_time_only in rooms_df.itertuples() %}
+    {% for index, row in rooms_df.iterrows() %}
         <div style="width: 500px; border: 2px solid grey; padding-left: 50px; padding-top: 20px; padding-bottom: 20px; margin-top: 20px;">
-            <h5>Room: {{ room_nr }}</h5>
-            <h6>Size: {{ size }}</h6>
-            <h6>{{ start_time.strftime(format="%H:%M") }} - {{ end_time.strftime(format="%H:%M") }}</h6>
-                <ul>
-                    <li>
-                        {{ subject }}
-                    </li>
-                </ul>
+            <h5>
+                Room: {{ row['room_nr'] }}
+            </h5>
+            {% if row['seats'] == None %}
+                <h6>
+                    Size: -
+                </h6>
+            {% else %}    
+                <h6>
+                    Size: {{ row['seats'] }}
+                </h6>
+            {% endif %}
+            {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                <h6>
+                    Free until: {{ row['start_time'].strftime('%H:%M') }}
+                </h6>
+                <h6>
+                    Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
+                </h6>
+            {% else %}
+                <h6>
+                    {{ row['subject'] }}
+                </h6>
+            {% endif %}
+
         </div>
     {% endfor %}
 
