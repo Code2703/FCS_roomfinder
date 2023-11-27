@@ -3,6 +3,7 @@ import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime as dt
+from datetime import timedelta
 from API_calls import API
 
 #########################################################################################
@@ -26,11 +27,15 @@ def home():
 
     # Initialize variables
     current_time = pd.to_datetime(dt.now()).time()
+    current_date = dt.now()
+    max_date = current_date + timedelta(days=30)
+    current_date = current_date.strftime("%Y-%m-%d")
+    max_date = max_date.strftime("%Y-%m-%d")
     
     # Display landing page for current time with no filters applied
     if request.method == 'GET':
         rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"))
-        return render_template('home.html', rooms_df=rooms_df)
+        return render_template('home.html', rooms_df=rooms_df, current_date=current_date, max_date=max_date)
     
     # Apply filters and re-render template
     else:
@@ -39,25 +44,45 @@ def home():
         filter_size_input = request.form.get("filter_size", np.inf).strip()
         filter_size = int(filter_size_input) if filter_size_input.isdigit() else np.inf
         
-        # Filter by start-time
+        # Handle start-time user input
         filter_time_input = request.form.get('filter_time', current_time)
         if filter_time_input == 'Now':
-            filter_time = current_time
+            filter_time = current_time.strftime("%H:%M")
         elif len(filter_time_input.split(":")) == 2 and all(part.isdigit() for part in filter_time_input.split(":")):
-            filter_time = pd.to_datetime(filter_time_input, format="%H:%M").time()
+            filter_time = filter_time_input
         else:
-            filter_time = current_time
-            
-        rooms_df = api.get_free_rooms(filter_time.strftime("%H:%M"))
+            filter_time = current_time.strftime("%H:%M")
+        
+        # Handle end-time user input
+        filter_end_time_input = request.form.get('filter_end_time', None)
+        if not (len(filter_end_time_input.split(":")) == 2 and all(part.isdigit() for part in filter_end_time_input.split(":"))):
+            filter_end_time = None
+        else:
+            filter_end_time = filter_end_time_input
+
+        # Filter by date
+        filter_date_input = request.form.get('filter_date', None)
+        if filter_date_input != None:
+            try:
+                # Validate the date format
+                dt.strptime(filter_date_input, '%Y-%m-%d')
+                filter_date = filter_date_input
+            except ValueError:
+                # Handle the case where the date format is incorrect
+                print("Incorrect date format provided.")
+                filter_date = current_date
+        else:
+            filter_date = current_date
+
+        # Get free rooms for user-specified time-window    
+        rooms_df = api.get_free_rooms(filter_time, filter_end_time, filter_date)
 
         # Apply size filter
         if filter_size != np.inf:
             rooms_df = rooms_df.query(f'size <= {filter_size}')
-        # # Filter by end-time
-        # filter_time_input = request.form.get('filter_end_time', time)
-        # filter_time = pd.to_datetime(filter_time_input, format="%H:%M").time()
+        
 
-        return render_template('home.html', rooms_df=rooms_df)
+        return render_template('home.html', rooms_df=rooms_df, current_date=current_date, max_date=max_date)
 
 
 # Detailed schedule of a given room

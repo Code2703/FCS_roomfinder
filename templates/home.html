@@ -61,13 +61,13 @@ Home
                         <div class="input-group has-validation">
                             <select class="form-select" aria-label="Large select example" name="filter_end_time" required>
                                 <option selected>hh:mm</option>
-                                <option value="08:15">08:15</option>
-                                <option value="10:15">10:15</option>
-                                <option value="12:15">12:15</option>
-                                <option value="14:15">14:15</option>
-                                <option value="16:15">16:15</option>
-                                <option value="18:15">18:15</option>
-                                <option value="20:15">20:15</option>
+                                <option value="10:00">10:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="18:00">18:00</option>
+                                <option value="20:00">20:00</option>
+                                <option value="22:00">22:00</option>
                             </select>
                             <div class="invalid-feedback">
                             Please select a start time.
@@ -76,10 +76,9 @@ Home
                     </div>
 
                     <!-- Filter by date -->
-                    <div class="col-md-4">
-                        <label class="form-label">Date:</label>
-                        <input type="text" name="filter_size">
-                    </div>
+                    <label for="start">Date:</label>
+
+                    <input type="date" name="filter_date" value="{{ current_date }}" min="{{ current_date }}" max="{{ max_date }}" />
                     
 
 

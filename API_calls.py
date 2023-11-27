@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime as dt
+from datetime import timedelta
 import re
 
 
@@ -60,21 +61,30 @@ class API:
 
         return campus_rooms_clean
     
-    def get_courses(self):
-        """Returns the schedule for the specified day, i.e., a timetable of all courses and their locations."""
-        # Assign corresponding url for API-call
-        url = "https://integration.preprod.unisg.ch/eventapi/EventDates/byStartDate/2023-11-20/byEndDate/2023-11-21"
+    def get_courses(self, date=None):
+        """Takes in date as a string in the format '%Y-%m-%d'. Returns the schedule for the specified day, i.e., a timetable of all courses and their locations."""
+        # Insert current date as default
+        if date is None:
+            date_obj = dt.now()
+        else:
+            # Convert string to datetime object
+            date_obj = dt.strptime(date, '%Y-%m-%d')
 
+        # Calculate the end date (next day)
+        end_date = date_obj + timedelta(days=1)
+
+        # Format the start and end dates to strings
+        start_date_str = date_obj.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
+        # Assign corresponding url for API-call
+        url = f"https://integration.preprod.unisg.ch/eventapi/EventDates/byStartDate/{start_date_str}/byEndDate/{end_date_str}"
+        
         headers = {
             "X-ApplicationId": self.api_token,
             "API-Version": "3",
             "X-RequestedLanguage": "en"
         }
-
-        # params = {
-        #     'byStartDate': date,
-        #     'byEndDate': date + timedelta(days=1)
-        # }
 
         response = requests.get(url, headers=headers)
 
@@ -127,11 +137,14 @@ class API:
             })
             return no_event_row
 
-    def get_free_rooms(self, filter_start, filter_end=None):
-        """Takes in start and end time (strings with format '%H:%M') for filtering timeframe and returns a dataframe of free rooms that match the filter"""
+    def get_free_rooms(self, filter_start, filter_end=None, date=None):
+        """
+        Input: Filter_start & filter_end as strings with format '%H:%M'; date as string with format '%Y-%m-%d'. Defaults to current date if none is specified.
+        Returns a dataframe of free rooms that match the filter.
+        """
         # Convert filter times to time objects
         filter_start = dt.strptime(filter_start, '%H:%M').time()
-        courses = self.get_courses()
+        courses = self.get_courses(date)
         rooms = self.get_rooms()
         merged_df = rooms.merge(courses, on='room_nr', how='left')
 
