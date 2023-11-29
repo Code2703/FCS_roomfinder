@@ -125,34 +125,33 @@ Home
       </div>
 
 
-
     {% for index, row in rooms_df.iterrows() %}
-        <div style="width: 500px; border: 2px solid grey; padding-left: 50px; padding-top: 20px; padding-bottom: 20px; margin-top: 20px;">
-            <h5>
-                Room: {{ row['room_nr'] }}
-            </h5>
-            {% if row['seats'] == None %}
-                <h6>
-                    Size: -
-                </h6>
-            {% else %}    
-                <h6>
-                    Size: {{ row['seats'] }}
-                </h6>
-            {% endif %}
-            {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                <h6>
-                    Free until: {{ row['start_time'].strftime('%H:%M') }}
-                </h6>
-                <h6>
-                    Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
-                </h6>
-            {% else %}
-                <h6>
-                    {{ row['subject'] }}
-                </h6>
-            {% endif %}
+        <div class="card" style="margin: 20px;">
+            <div class="card-header">
+                Type of Room
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Room: {{ row['room_nr'] }}</h5>
+                <p class="card-text">
+                    <Div> 
+                        {% if row['seats'] == None %} 
+                            Size: -
+                        {% else %}    
+                            Size: {{ row['seats'] }}
+                        {% endif %}
+                    </Div>
+                    <div>
+                        {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                        Free until: {{ row['start_time'].strftime('%H:%M') }}
+                        Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
+                        {% else %}
+                        {{ row['subject'] }}
+                        {% endif %}
+                    </div>
+                </p>
 
+                <a href="#" class="btn btn-primary">More details</a>
+            </div>
         </div>
     {% endfor %}
 
