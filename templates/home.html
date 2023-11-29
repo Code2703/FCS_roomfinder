@@ -9,111 +9,120 @@ Home
 
 
 {% block main %}
-    
-    
-    <div class="container px-4 text-center">
-        <div class="row gx-5">
-            <div class="col">
-                <h3>Looking for an empty room?</h3>
-                <p>Fill out the form or select your favorite room from the dropdown menu! </p>
-            </div> 
-        </div>
-      </div>
-
-    <div class="container px-4 text-start">
-                <form class="row g-2 needs-validation" action="" method="post" novalidate>
   
-                    <!-- Select by size -->
-                    <div class="col-md-2.5">
-                        <label for="validationCustom01" class="form-label">Max. Room Size:</label>
-                        <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                    </div>
-                    
-                    <!-- Filter by date -->
-                    <div class="col-md-2.5">
-                        <label for="start" class="form-label">Date:</label>
-                        <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                    </div>
+<div class="container px-4 text-center" style="margin-top: 40px;">
+    <div class="row gx-5">
+        <div class="col">
+            <h3>Looking for an empty room?</h3>
+            <p>Fill out the form or select your favorite room from the dropdown menu! </p>
+        </div> 
+    </div>
+</div>
 
-                    <!-- Filter by start time -->
-                    <div class="col-md-2.5">
-                        <label for="start_time" class="form-label">From:</label>
-                        <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                    </div>
 
-                    <!-- Filter by end time -->
-                    <div class="col-md-2.5">
-                        <label for="start_time" class="form-label">From:</label>
-                        <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                    </div>
+<div class="container text-center">
+    <div class="row align-items-start">
+      <div class="col-sm">
+                    <form action="" method="post" novalidate>
+    
+                        <!-- Select by size -->
 
-                    
-                    <!-- Filter by availability -->
-                    <div class="col-2.5">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="filter_available" required>
-                            <label class="form-check-label" for="filter_available">
-                            Only show available rooms
-                            </label>
-                        </div>
-                    </div>
-        
-        
-                    <!-- Submit the form -->
-                    <div class="col-2.5">
-                        <button class="btn btn-primary" type="submit" name="button_filter_size" style="margin: 10px;">Show me empty rooms!</button>
-                    </div>
-                </form>
+                            <label for="validationCustom01" class="form-label">Max. Room Size:</label>
+                            <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
 
-                <!-- Button to clear all filters -->
-                <div>
-                    <form action="{{ url_for('clear_filters') }}" method="post">
-                        <button type="submit" class="btn btn-secondary" style="margin: 10px;">Clear Filters</button>
-                    </form>                
-                </div>
+                        
+                        <!-- Filter by date -->
+
+                            <label for="start" class="form-label">Date:</label>
+                            <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+
+
+                        <!-- Filter by start time -->
+
+                            <label for="start_time" class="form-label">From:</label>
+                            <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                        </div>
+
+                        <!-- Filter by end time -->
+
+                            <label for="start_time" class="form-label">To:</label>
+                            <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+
+
+                        
+                        <!-- Filter by availability -->
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" name="filter_available" required>
+                                <label class="form-check-label" for="filter_available">
+                                Only show available rooms
+                                </label>
+                            </div>
+
+            
+            
+                        <!-- Submit the form -->
+                        <div class="col">
+                            <button class="btn btn-primary" type="submit" name="button_filter_size" style="margin: 10px;">Show me empty rooms!</button>
+                        </div>
+                    </form>
+
+                    <!-- Button to clear all filters -->
+                    <div>
+                        <form action="{{ url_for('clear_filters') }}" method="post">
+                            <button type="submit" class="btn btn-secondary" style="margin: 10px;">Clear Filters</button>
+                        </form>                
+                    </div>
+        </div>
       </div>
 
+      <div class="col-7">
+        {% for index, row in rooms_df.iterrows() %}
+            <div class="card" style="margin: 20px;">
+                <div class="card-header">
+                    Type of Room
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Room: {{ row['room_nr'] }}</h5>
+                    <p class="card-text">
+                        <Div> 
+                            {% if row['seats'] == None %} 
+                                Size: -
+                            {% else %}    
+                                Size: {{ row['seats'] }}
+                            {% endif %}
+                        </Div>
+                        <div>
+                            {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                            Free until: {{ row['start_time'].strftime('%H:%M') }}
+                        </div>
+                        <div>
+                            Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
+                            {% else %}
+                            {{ row['subject'] }}
+                            {% endif %}
+                        </div>
+                    </p>
 
-    {% for index, row in rooms_df.iterrows() %}
-        <div class="card" style="margin: 20px;">
-            <div class="card-header">
-                Type of Room
+                    <a href="#" class="btn btn-primary">More details</a>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Room: {{ row['room_nr'] }}</h5>
-                <p class="card-text">
-                    <Div> 
-                        {% if row['seats'] == None %} 
-                            Size: -
-                        {% else %}    
-                            Size: {{ row['seats'] }}
-                        {% endif %}
-                    </Div>
-                    <div>
-                        {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                        Free until: {{ row['start_time'].strftime('%H:%M') }}
-                        Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
-                        {% else %}
-                        {{ row['subject'] }}
-                        {% endif %}
-                    </div>
-                </p>
+        {% endfor %}
 
-                <a href="#" class="btn btn-primary">More details</a>
-            </div>
-        </div>
-    {% endfor %}
+    </div>
 
+  </div>
+</div>
 {% endblock %}
