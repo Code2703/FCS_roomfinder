@@ -21,69 +21,47 @@ Home
       </div>
 
     <div class="container px-4 text-start">
-        <div class="row gx-5">
-            <div class="col-8" >
-             <div class="p-3">
                 <form class="row g-2 needs-validation" action="" method="post" novalidate>
   
-                    <!-- Filter by size -->
-                    <div class="col-md-4">
+                    <!-- Select by size -->
+                    <div class="col-md-2.5">
                         <label for="validationCustom01" class="form-label">Max. Room Size:</label>
                         <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
                         <div class="valid-feedback">
                             Looks good!
                         </div>
                     </div>
-        
-                    <!-- Select start time from options. COULD WE HAVE THE USER INPUT AND JUST VALIDATE THAT THE INPUT IS OK? -->    
-                    <div class="col-md-4">
-                        <label for="validationCustomUsername" class="form-label">From:</label>
-                        <div class="input-group has-validation">
-                            <select class="form-select" aria-label="Large select example" name="filter_time" required>
-                                <option value="Now" {% if filter_time == "Now" %}selected{% endif %}>Now</option>
-                                <option value="08:15" {% if filter_time == "08:15" %}selected{% endif %}>08:15</option>
-                                <option value="10:15" {% if filter_time == "10:15" %}selected{% endif %}>10:15</option>
-                                <option value="12:15" {% if filter_time == "12:15" %}selected{% endif %}>12:15</option>
-                                <option value="14:15" {% if filter_time == "14:15" %}selected{% endif %}>14:15</option>
-                                <option value="16:15" {% if filter_time == "16:15" %}selected{% endif %}>16:15</option>
-                                <option value="18:15" {% if filter_time == "18:15" %}selected{% endif %}>18:15</option>
-                                <option value="20:15" {% if filter_time == "20:15" %}selected{% endif %}>20:15</option>
-                            </select>
-                            <div class="invalid-feedback">
-                            Please select a start time.
-                            </div>
-                        </div>
-                    </div>
-        
-                    <!-- Select end time from options. COULD WE HAVE THE USER INPUT AND JUST VALIDATE THAT THE INPUT IS OK? -->    
-                    <div class="col-md-4">
-                        <label for="validationCustomUsername" class="form-label">Until:</label>
-                        <div class="input-group has-validation">
-                            <select class="form-select" aria-label="Large select example" name="filter_end_time" required>
-                                <option value="{{ rounded_up_time_str }}" {% if filter_end_time == rounded_up_time_str %}selected{% endif %}>{{ rounded_up_time_str }}</option>
-                                <option value="10:00" {% if filter_end_time == "10:00" %}selected{% endif %}>10:00</option>
-                                <option value="12:00" {% if filter_end_time == "12:00" %}selected{% endif %}>12:00</option>
-                                <option value="14:00" {% if filter_end_time == "14:00" %}selected{% endif %}>14:00</option>
-                                <option value="16:00" {% if filter_end_time == "16:00" %}selected{% endif %}>16:00</option>
-                                <option value="18:00" {% if filter_end_time == "18:00" %}selected{% endif %}>18:00</option>
-                                <option value="20:00" {% if filter_end_time == "20:00" %}selected{% endif %}>20:00</option>
-                                <option value="22:00" {% if filter_end_time == "22:00" %}selected{% endif %}>22:00</option>
-                            </select>
-                            <div class="invalid-feedback">
-                            Please select a start time.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Filter by date -->
-                    <label for="start">Date:</label>
-
-                    <input type="date" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" />
                     
+                    <!-- Filter by date -->
+                    <div class="col-md-2.5">
+                        <label for="start" class="form-label">Date:</label>
+                        <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
 
+                    <!-- Filter by start time -->
+                    <div class="col-md-2.5">
+                        <label for="start_time" class="form-label">From:</label>
+                        <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
 
+                    <!-- Filter by end time -->
+                    <div class="col-md-2.5">
+                        <label for="start_time" class="form-label">From:</label>
+                        <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+
+                    
                     <!-- Filter by availability -->
-                    <div class="col-8">
+                    <div class="col-2.5">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" name="filter_available" required>
                             <label class="form-check-label" for="filter_available">
@@ -94,34 +72,17 @@ Home
         
         
                     <!-- Submit the form -->
-                    <div class="col-12">
-                        <button class="btn btn-primary" type="submit" name="button_filter_size">Show me empty rooms!</button>
+                    <div class="col-2.5">
+                        <button class="btn btn-primary" type="submit" name="button_filter_size" style="margin: 10px;">Show me empty rooms!</button>
                     </div>
                 </form>
-               </div>
-            </div>
-        
-            <!--Drop down to select your favorite room-->
-            <div class="col-4">
-                <div class="p-3">
-                    <label for="validationCustom01" class="form-label">Select a room to view availability.</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Select a room</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Button to clear all filters -->
-            <div>
-                <form action="{{ url_for('clear_filters') }}" method="post">
-                    <button type="submit" class="btn btn-primary">Clear Filters</button>
-                </form>                
-            </div>
 
-        </div>
+                <!-- Button to clear all filters -->
+                <div>
+                    <form action="{{ url_for('clear_filters') }}" method="post">
+                        <button type="submit" class="btn btn-secondary" style="margin: 10px;">Clear Filters</button>
+                    </form>                
+                </div>
       </div>
 
 
