@@ -9,54 +9,55 @@ Home
 
 
 {% block main %}
+
   
-<div class="container">
-    <h3>Looking for an empty room?</h3>
-    <p>Fill out the form or select your favorite room from the dropdown menu! </p>
+<div class="container text-center" style="padding: 20px;">
+    <h3>You need space? We've got rooms!</h3>
+    <p>Discovering the perfect study sanctuary on campus is now effortlessly at your fingertips! 
+        Simply input your preferred maximum room size for a comfortable experience, along with the 
+        date and time, and let UniSG Roomfinder unveil all the available quiet spaces tailored just for you. 
+        Elevate your study sessions with ease and precision! 📚✨
+    </p>
 </div>
 
-<div class="container">
-    <h3>Looking for an empty room?</h3>
-    <p>Fill out the form or select your favorite room from the dropdown menu! </p>
-</div>
 
 <div class="container text-center">
     <div class="row align-items-start">
 
         <!-- Filters Column -->
-        <div class="col-sm">
+        <div class="col">
             <div>
                 <form action="" method="post" novalidate>
                     <!-- Select by size -->
-                    <label for="validationCustom01" class="form-label">Max. Room Size:</label>
+                    <label for="validationCustom01" class="form-label" style="margin-top: 10px;">Max. Room Size:</label>
                     <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
 
                     <!-- Filter by date -->
-                    <label for="start" class="form-label">Date:</label>
+                    <label for="start" class="form-label" style="margin-top: 10px;">Date:</label>
                     <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
 
                     <!-- Filter by start time -->
-                    <label for="start_time" class="form-label">From:</label>
+                    <label for="start_time" class="form-label" style="margin-top: 10px;">From:</label>
                     <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
 
                     <!-- Filter by end time -->
-                    <label for="start_time" class="form-label">To:</label>
+                    <label for="start_time" class="form-label" style="margin-top: 10px;">To:</label>
                     <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
 
                     <!-- Filter by availability -->
-                    <div class="form-check">
+                    <div class="form-check" style="margin-top: 10px;">
                         <input class="form-check-input" type="checkbox" value="" name="filter_available" required>
                         <label class="form-check-label" for="filter_available">
                             Only show available rooms
@@ -79,7 +80,7 @@ Home
         </div>
 
         <!-- Rooms Column -->
-        <div class="col-8">
+        <div class="col-9">
             {% for index, row in rooms_df.iterrows() %}
                 <div class="card" style="margin: 20px;">
                     <div class="card-header">
