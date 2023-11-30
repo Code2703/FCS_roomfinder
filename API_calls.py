@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime as dt
 from datetime import timedelta
 import re
+from pandas import json_normalize
 
 
 class API:
@@ -14,52 +15,63 @@ class API:
     
     # Define method to call on-campus rooms
     def get_rooms(self):
-        """Returns a pandas dataframe containing all campus rooms of format xx-(U)xxx, including their capacity and system IDs. Note that some rooms have multiple IDs."""
-        # API URL for Rooms
-        url = "https://integration.preprod.unisg.ch/toolapi/Rooms"
+        """Returns a pandas dataframe containing all lecture rooms, including their capacity and system IDs. Note that some rooms have multiple IDs."""
+        url = "http://api.mazemap.com/api/pois/?campusid=710&srid=4326"
 
-        # Headers for API call
-        headers = {
-            "X-ApplicationId": self.api_token,
-            "API-Version": "1",
-            "X-RequestedLanguage": "en"
-        }
+        response = requests.get(url)
 
-        # Get response from API
-        response = requests.get(url, headers=headers)
-
-        # Error handling for API call
         if response.ok:
             json_response = response.json()
-            print(json_response)
-            df = pd.DataFrame(json_response)
-        else:
-            print("Error: ", response.status_code)
 
-        # Define RegEx pattern to look for on-campus rooms (pattern: xx-(U)xxx)
-        pattern = r"\b\d{2}-[U]?\d{3}\b"
+            # Extract the 'pois' list
+            pois_data = json_response.get('pois', [])
+
+            # Flatten the data and create DataFrame
+            df = json_normalize(pois_data)
+        else:
+            print("Error calling the API: ", response.status_code)
+
+
+        # Normalize JSON data excluding 'infos' and 'types'
+        df = json_normalize(
+            json_response['pois'],
+            meta=[
+                'poiId', 'kind', ['point', 'type'], ['point', 'coordinates'],
+                ['geometry', 'type'], ['geometry', 'coordinates'],
+                'campusId', 'floorId', 'floorName', 'buildingId', 'buildingName',
+                'identifierId', 'identifier', 'title', 'deleted',
+                'z', 'infoUrl', 'infoUrlText', 'description', 'peopleCapacity',
+                'images', 'types'
+            ],
+            errors='ignore'
+        )
+
+        # Extract only the first entry from each 'types' list
+        def extract_first_type(types_list):
+            return types_list[0] if types_list else {}
+
+        df['first_type'] = df['types'].apply(extract_first_type)
+
+        # Normalize the first type data
+        df_first_type = df['first_type'].apply(pd.Series)
+
+        # Concatenate the first type data back to the main DataFrame
+        df_final = pd.concat([df.drop(columns=['types', 'first_type']), df_first_type], axis=1)
+
+        # Drop and rename columns
+        df_final.drop(columns=['identifierId', 'identifier', 'images', 'nodeId', 'kind', 'deleted', 'campusId'], inplace=True)
+        df_final.rename({'peopleCapacity':'seats'}, axis=1,inplace=True)
+
+        # Define pattern to extract for room_nr
+        pattern = r"(?<!\w)(\d{2}-\d{3,4})\b"
 
         # Boolean mask based on specified RegEx pattern
-        mask = df['shortName'].str.contains(pattern, na=False)
+        df_final['room_nr'] = df_final['title'].str.extract(pattern)
 
-        # Filter rooms using RegEx mask
-        campus_rooms = df[mask].copy()
+        # Exclude rooms that don't fit room_nr pattern
+        df_final = df_final.loc[~df_final['room_nr'].isna()]
 
-        # Extract clean room number from shortName column
-        campus_rooms['room_nr'] = campus_rooms['shortName'].apply(lambda x: re.split(r"[\s/]", x)[0].strip("#"))
-
-        # Second mask to ensure consistency
-        mask = campus_rooms['room_nr'].str.contains(pattern, na=False)
-        campus_rooms = campus_rooms[mask]
-
-        # Group by shortName as unique identifier and collect all IDs assigned in the system, seating capacity and floor
-        campus_rooms_clean = campus_rooms.groupby('room_nr')[['id', 'floor', 'seats']].agg(list).reset_index()
-
-        # Keep only one of the (identical) floor values and only the largest capacity value
-        campus_rooms_clean['floor'] = campus_rooms_clean['floor'].apply(lambda x: x[0])
-        campus_rooms_clean['seats'] = campus_rooms_clean['seats'].apply(lambda x: max(x))
-
-        return campus_rooms_clean
+        return df_final
     
     def get_courses(self, date=None):
         """Takes in date as a string in the format '%Y-%m-%d'. Returns the schedule for the specified day, i.e., a timetable of all courses and their locations."""
@@ -116,26 +128,21 @@ class API:
         return rooms_df
     
 
-    def next_event(self, df, room_nr, filter_end, room_info):
+    # def next_event(self, df, room_nr, filter_end, room_info):
+    def next_event(self, df, room_nr, filter_end):
         room_events = df.query("room_nr == @room_nr and start_time.dt.time > @filter_end")
         if not room_events.empty:
             return room_events.sort_values(by='start_time').head(1)
         else:
             # Create a row for rooms with no more events
-            room_details = room_info.loc[room_info['room_nr'] == room_nr]
-            no_event_row = pd.DataFrame({
-                'room_nr': [room_nr],
-                'id': [room_details.iloc[0]['id']],
-                'floor': [None],
-                'seats': [room_details.iloc[0]['seats']],
-                'size': [None],
-                'start_time': [None],
-                'end_time': [None],
-                'subject': ['No more events planned for today'],
-                'start_time_only': [None],
-                'end_time_only': [None],
-                'date': [None]
-            })
+            room_details = df.loc[df['room_nr'] == room_nr].head(1).copy()
+            room_details['start_time'] = None
+            room_details['end_time'] = None
+            room_details['start_time_only'] = None
+            room_details['end_time_only'] = None
+
+            no_event_row = pd.DataFrame(room_details)
+            no_event_row['subject'] = ['No more events planned for today']
             return no_event_row
 
     def get_free_rooms(self, filter_start, filter_end=None, date=None):
@@ -155,7 +162,7 @@ class API:
             free_rooms = list(filter(lambda x: x not in occupied, rooms['room_nr']))
             filtered_dfs = []
             for room in free_rooms:
-                filtered_df = self.next_event(merged_df, room, filter_end, rooms)
+                filtered_df = self.next_event(merged_df, room, filter_end) # removed kwarg: , rooms
                 filtered_dfs.append(filtered_df)
 
             result_df = pd.concat(filtered_dfs)
@@ -165,7 +172,7 @@ class API:
             free_rooms = list(filter(lambda x: x not in occupied, rooms['room_nr']))
             filtered_dfs = []
             for room in free_rooms:
-                filtered_df = self.next_event(merged_df, room, filter_start, rooms)
+                filtered_df = self.next_event(merged_df, room, filter_start)  # removed kwarg: , rooms
                 filtered_dfs.append(filtered_df)
 
             result_df = pd.concat(filtered_dfs)
