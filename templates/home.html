@@ -28,6 +28,39 @@ Home
         <div class="col">
             <div>
                 <form action="" method="post" novalidate>
+                    
+                    <!-- Filter by date -->
+                    <label for="start" class="form-label" style="margin-top: 10px;">Date:</label>
+                    <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    
+                    <!-- Filter by start time -->
+                    <label for="start_time" class="form-label" style="margin-top: 10px;">From:</label>
+                    <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    
+                    <!-- Filter by end time -->
+                    <label for="start_time" class="form-label" style="margin-top: 10px;">To:</label>
+                    <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    
+                    <!-- Enter nearest room for routing directions -->
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label for="start_location">My location:</label>
+                        <input class="form-control" list="location_list" id="start_location" name="start_location" />
+                    </div>
+                    <datalist id="location_list">
+                        {% for index, row in start_locations.iterrows() %}
+                            <option value="{{ row['room_nr'] }}"></option>
+                        {% endfor %}
+                    </datalist>
+
                     <!-- Select by size -->
                     <label for="validationCustom01" class="form-label" style="margin-top: 10px;">Max. Room Size:</label>
                     <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
@@ -35,54 +68,35 @@ Home
                         Looks good!
                     </div>
 
-                    <!-- Filter by date -->
-                    <label for="start" class="form-label" style="margin-top: 10px;">Date:</label>
-                    <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-
-                    <!-- Filter by start time -->
-                    <label for="start_time" class="form-label" style="margin-top: 10px;">From:</label>
-                    <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-
-                    <!-- Filter by end time -->
-                    <label for="start_time" class="form-label" style="margin-top: 10px;">To:</label>
-                    <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-
-                    <!-- Filter by room -->
+                    <!-- Filter by room
                     <label for="room_selector" class="form-label" style="margin-top: 10px;">Select a room:</label>
                     <select class="form-select" name="room_selector" aria-label="Default select example">
                         <option selected>Coming Soon!</option>
                         {% for index, row in rooms_df.iterrows() %}
                         <option value="1">Room: {{ row['room_nr'] }}</option>
                         {% endfor %}
-                    </select>   
+                    </select> -->
+                    
 
-                    <!-- Filter by availability -->
+                    <!-- Filter by availability
                     <div class="form-check" style="margin-top: 20px;">
                         <input class="form-check-input" type="checkbox" value="" name="filter_available" required>
                         <label class="form-check-label" for="filter_available">
                             Only show available rooms
                         </label>
-                    </div>
+                    </div> -->
              
                     <!-- Submit the form -->
                     <div class="col">
-                        <button class="btn btn-primary" type="submit" name="button_filter_size" style="margin: 10px;">Show me empty rooms!</button>
+                        <button class="btn btn-primary" type="submit" name="button_filter_size" style="margin: 10px; width: 80px;">Search</button>
                     </div>
                 </form>
-
+                
                 <!-- Button to clear all filters -->
+                
                 <div>
                     <form action="{{ url_for('clear_filters') }}" method="post">
-                        <button type="submit" class="btn btn-secondary" style="margin: 10px;">Clear Filters</button>
+                        <button type="submit" class="btn btn-secondary" style="margin: 10px; width: 80px;">Clear</button>
                     </form>
                 </div>
             </div>
@@ -93,7 +107,7 @@ Home
             {% for index, row in rooms_df.iterrows() %}
                 <div class="card" style="margin: 20px;">
                     <div class="card-header">
-                        Type of Room
+                        {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">Room: {{ row['room_nr'] }}</h5>
@@ -108,21 +122,25 @@ Home
                             <div>
                                 {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
                                     Free until: {{ row['start_time'].strftime('%H:%M') }}
-                                </div>
-                                <div>
+                            </div>
+                            <div> 
                                     Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
                                 {% else %}
                                     {{ row['subject'] }}
                                 {% endif %}
                             </div>
                         </p>
-
-                        <a href="#" class="btn btn-primary">More details</a>
+                        
+                        <button class="btn btn-primary" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')">More Details</button>
                     </div>
                 </div>
             {% endfor %}
         </div>
     </div>
 </div>
-
+<script>
+    function redirectToRoomDetails(roomNr) {
+        window.location.href = '/map?room_nr=' + roomNr;
+    }
+</script>    
 {% endblock %}

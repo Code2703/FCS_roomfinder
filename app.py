@@ -64,7 +64,10 @@ def home():
         # Filter lecture rooms
         rooms_df = api.filter_rooms(rooms_df)
 
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str)
+        # Starting locations to select for routing
+        start_locations = api.get_rooms()
+
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations)
     
     # Apply filters and re-render template
     else:
@@ -113,16 +116,23 @@ def home():
         if filter_size != np.inf:
             rooms_df = rooms_df.query(f'seats <= {filter_size}')
 
+        # Get current location
+        current_loc = request.form['start_location']
+
         # Set session variables to store filter configuration
         session['filter_time'] = filter_time
         session['filter_end_time'] = filter_end_time
         session['filter_date'] = filter_date
         session['filter_size'] = filter_size
+        session['current_loc'] = current_loc
 
+        # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
         filter_size_is_inf = filter_size == np.inf
         
+        # Starting locations to select for directions
+        start_locations = api.get_rooms()
 
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf)
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, start_locations=start_locations)
 
 # Route to clear filter session variables
 @app.route('/clear_filters', methods=['POST'])
@@ -149,17 +159,19 @@ def room():
     else:
         return render_template('apology.html')
     
-@app.route('/map')
+@app.route('/map', methods=['GET'])
 def map():
-    # Example coordinates - replace with your actual coordinates
-    latitude = 59.911491
-    longitude = 10.757933
+    rooms = api.get_rooms()
+    start_room_nr = request.args.get('room_nr')
+    dest_room_nr = session['current_loc']
+    start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
+    dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
 
     # Construct the iframe URL with your parameters
-    iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest=1000725770&starttype=poi&start=1000725329"
+    iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={start_poiId}&starttype=poi&start={dest_poiId}"
 
     # Pass the iframe URL to the template
-    return render_template('map.html', iframe_url=iframe_url)
+    return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId)
 
 if __name__ == '__main__':
     app.run(debug=True)
