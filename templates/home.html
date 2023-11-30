@@ -56,14 +56,23 @@ Home
                         Looks good!
                     </div>
 
+                    <!-- Filter by room -->
+                    <label for="room_selector" class="form-label" style="margin-top: 10px;">Select a room:</label>
+                    <select class="form-select" name="room_selector" aria-label="Default select example">
+                        <option selected>Coming Soon!</option>
+                        {% for index, row in rooms_df.iterrows() %}
+                        <option value="1">Room: {{ row['room_nr'] }}</option>
+                        {% endfor %}
+                    </select>   
+
                     <!-- Filter by availability -->
-                    <div class="form-check" style="margin-top: 10px;">
+                    <div class="form-check" style="margin-top: 20px;">
                         <input class="form-check-input" type="checkbox" value="" name="filter_available" required>
                         <label class="form-check-label" for="filter_available">
                             Only show available rooms
                         </label>
                     </div>
-
+             
                     <!-- Submit the form -->
                     <div class="col">
                         <button class="btn btn-primary" type="submit" name="button_filter_size" style="margin: 10px;">Show me empty rooms!</button>
