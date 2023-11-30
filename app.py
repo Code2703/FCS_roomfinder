@@ -54,15 +54,16 @@ def home():
         session.setdefault('filter_date', current_date)
         session.setdefault('filter_size', np.inf)
         
-            # Calculate the time that is 30 minutes ahead
-
         # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
         filter_size = session.get('filter_size')
         filter_size_is_inf = filter_size == np.inf
 
         # Retrieve specified data from API
-        rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"))
-        
+        rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"), rounded_up_time_str)
+
+        # Filter lecture rooms
+        rooms_df = api.filter_rooms(rooms_df)
+
         return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str)
     
     # Apply filters and re-render template
@@ -104,7 +105,10 @@ def home():
 
         # Get free rooms for user-specified time-window    
         rooms_df = api.get_free_rooms(filter_time, filter_end_time, filter_date)
-
+        
+        # Filter lecture rooms
+        rooms_df = api.filter_rooms(rooms_df)
+        
         # Apply size filter
         if filter_size != np.inf:
             rooms_df = rooms_df.query(f'seats <= {filter_size}')

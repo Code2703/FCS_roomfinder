@@ -187,3 +187,10 @@ class API:
         result_df['date'] = result_df['date'].fillna(placeholder_datetime)
 
         return result_df
+    
+    def filter_rooms(self, rooms_df):
+        included_name = ['Unterrichtsraum']
+        excluded_infoUrlText = ['Dozierenden Lounge', 'theCo', 'theStage']
+        excluded_buildingName = ['A 10 Sporthalle', 'D 14 WBZ Holzweid', 'D 15 Hans Ulrich Auditorium']
+        result_df = rooms_df.query("name in @included_name and not (infoUrlText in @excluded_infoUrlText or buildingName in @excluded_buildingName)").copy()
+        return result_df
