@@ -148,6 +148,18 @@ def room():
     # Have a look at how it's implemented in the landing page above and also have a look at how you have to specify the HTML forms in the "home.html" template to post to the page.
     else:
         return render_template('apology.html')
+    
+@app.route('/map')
+def map():
+    # Example coordinates - replace with your actual coordinates
+    latitude = 59.911491
+    longitude = 10.757933
+
+    # Construct the iframe URL with your parameters
+    iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest=1000725770&starttype=poi&start=1000725329"
+
+    # Pass the iframe URL to the template
+    return render_template('map.html', iframe_url=iframe_url)
 
 if __name__ == '__main__':
     app.run(debug=True)

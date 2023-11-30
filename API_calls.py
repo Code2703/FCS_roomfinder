@@ -16,7 +16,7 @@ class API:
     # Define method to call on-campus rooms
     def get_rooms(self):
         """Returns a pandas dataframe containing all lecture rooms, including their capacity and system IDs. Note that some rooms have multiple IDs."""
-        url = "http://api.mazemap.com/api/pois/?campusid=710&srid=4326"
+        url = "http://api.mazemap.com/api/pois/?campusid=710&srid=900913"
 
         response = requests.get(url)
 
