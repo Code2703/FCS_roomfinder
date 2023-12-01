@@ -23,7 +23,7 @@ Home
     <div class="row align-items-start">
 
         <!-- Filters Column -->
-        <div class="col" style="background-color: rgb(159, 167, 159);">
+        <div class="col" style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; margin-top: 15px;">
             <div>
                 <form action="" method="post" novalidate>
                     
@@ -49,15 +49,13 @@ Home
                     </div>
                     
                     <!-- Enter nearest room for routing directions -->
-                    <div class="form-group" style="margin-top: 10px;">
-                        <label for="start_location" style="margin-top: 10px; font-weight: bold;">My nearest room:</label>
-                        <input class="form-control" list="location_list" id="start_location" name="start_location" />
-                    </div>
-                    <datalist id="location_list">
-                        {% for index, row in start_locations.iterrows() %}
-                            <option value="{{ row['room_nr'] }}"></option>
+                    <label for="start_location" class="form-label" style="margin-top: 10px; font-weight: bold;">My location:</label>
+                    <select class="form-select" aria-label="Default select example" id="start_location" name="start_location">
+                        <option selected>Select nearest room</option>
+                        {% for index, row in rooms_df.iterrows() %}
+                        <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
                         {% endfor %}
-                    </datalist>
+                      </select>
 
                     <!-- Select by size -->
                     <label for="validationCustom01" class="form-label" style="margin-top: 10px; font-weight: bold;">Max. Room Size:</label>
@@ -68,14 +66,14 @@ Home
 
                     <!-- Submit the form -->
                     <div class="col">
-                        <button class="btn btn-primary" type="submit" onclick="" name="button_filter_size" style="margin-top: 10px;">Search</button>
+                        <button class="btn btn-primary" type="submit" onclick="" name="button_filter_size" style="margin-top: 10px; width: 100px;">Search</button>
                     </div>
                 </form>
                 
                 <!-- Button to clear all filters -->
                 <div>
                     <form action="{{ url_for('clear_filters') }}" method="post">
-                        <button type="submit" class="btn btn-secondary" style="margin: 10px; width: 80px;">Clear</button>
+                        <button type="submit" class="btn btn-outline-secondary" style="margin-top: 10px; width: 100;">Clear</button>
                     </form>
                 </div>
             </div>
