@@ -81,6 +81,22 @@ Home
 
         <!-- Rooms Column -->
         <div class="col-12 col-sm-9">
+            <div name="filter_room_type" style="margin: 15px;">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <button class="nav-link active filter-btn" type="button" onclick="toggleFilter(this)" name="filter_all_rooms">All rooms</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_lecture_rooms">Lecture rooms</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_group_rooms">Group study rooms</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_studyspots">Studyspots</button>
+                    </li>
+                  </ul>
+            </div>
             {% for index, row in rooms_df.iterrows() %}
             <div class="card" style="margin: 15px;">
                 <div class="card-header" style="font-weight: bold;">
@@ -119,7 +135,7 @@ Home
                             {% endif %}
                             </p>
                             <!-- Column 5: More Details Button -->
-                            <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')">More Details</button>
+                            <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="margin-top: 20px; width: 100px;">Route</button>
                         </div>
             
                 
@@ -140,5 +156,17 @@ Home
     function redirectToRoomDetails(roomNr) {
         window.location.href = '/map?room_nr=' + roomNr;
     }
-</script>    
-{% endblock %}
+
+    function toggleFilter(button) {
+        // Remove 'active' class from all buttons
+        $('.filter-btn').removeClass('active');
+
+        // Add 'active' class to the clicked button
+        $(button).addClass('active');
+        
+
+        // Add your logic to handle the filter based on the clicked button
+        // For example, you can trigger an AJAX request or update the content dynamically
+    }
+</script>   
+{% endblock %} 

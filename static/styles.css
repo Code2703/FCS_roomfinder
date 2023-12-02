@@ -48,3 +48,22 @@ tbody tr:nth-of-type(odd) {
 h5 {
     margin-top: 1rem;
 }
+
+/* nav links */
+.nav-link {
+    color: #2e944b; /* Green color */
+}
+
+.nav-link.active {
+    color: #2e944b62; /* Green color */
+}
+
+/* Normaler (nicht-hover) Zustand für nav-link */
+.nav-tabs .nav-item button.nav-link {
+    color: #2e944b !important;
+}
+ 
+/* Hover-Effekt für nav-link */
+.nav-tabs .nav-item button.nav-link:hover {
+    color: #2e944b62 !important;
+}

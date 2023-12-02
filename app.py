@@ -173,5 +173,10 @@ def map():
     # Pass the iframe URL to the template
     return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId)
 
+# Navbar routing to the other pages
+@app.route('/apology')
+def apology():
+    return render_template('apology.html')
+    
 if __name__ == '__main__':
     app.run(debug=True)
