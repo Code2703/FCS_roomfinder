@@ -25,7 +25,7 @@ Home
         <!-- Filters Column -->
         <div class="col" style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; margin-top: 15px;">
             <div>
-                <form action="" method="post" novalidate>
+                <form action="{{ url_for('home') }}" method="post" novalidate>
                     
                     <!-- Filter by date -->
                     <label for="start" class="form-label" style="margin-top: 10px; font-weight: bold;">Date:</label>
@@ -97,6 +97,7 @@ Home
                     </li>
                   </ul>
             </div>
+            {% if filter_applied %}
             {% for index, row in rooms_df.iterrows() %}
             <div class="card" style="margin: 15px;">
                 <div class="card-header" style="font-weight: bold;">
@@ -146,6 +147,7 @@ Home
                 </div>
             </div>
             {% endfor %}
+            {% endif %}
         </div>
          
     </div>

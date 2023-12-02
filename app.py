@@ -34,6 +34,7 @@ def home():
     current_date = dt.now()
     max_date = current_date + timedelta(days=30)
     min_date = current_date - timedelta(days=30)
+    filter_applied = False
     
     # Format dates as strings
     current_date = current_date.strftime("%Y-%m-%d")
@@ -46,6 +47,7 @@ def home():
     rounded_up_time_str = rounded_up_time.strftime("%H:%M")
     
     # Display landing page for current time with no filters applied
+    
     if request.method == 'GET':
         
         # Set default session values
@@ -131,6 +133,8 @@ def home():
         
         # Starting locations to select for directions
         start_locations = api.get_rooms()
+
+        filter_applied = True
 
         return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, start_locations=start_locations)
 
