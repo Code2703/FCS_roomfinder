@@ -1,15 +1,10 @@
 {% extends 'layout.html' %}
 
-
-
 {% block title %}
 Home
 {% endblock %}
 
-
-
 {% block main %}
-
 <div class="container text-center" style="padding: 20px;">
     <h3>You need space? We've got rooms!</h3>
     <p>Discovering the perfect study sanctuary on campus is now effortlessly at your fingertips! 
@@ -21,124 +16,145 @@ Home
 
 <div class="container text-center">
     <div class="row align-items-start">
-
         <!-- Filters Column -->
         <div class="col" style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; margin-top: 15px;">
-            <div>
-                <form action="" method="post" novalidate>
-                    
-                    <!-- Filter by date -->
-                    <label for="start" class="form-label" style="margin-top: 10px; font-weight: bold;">Date:</label>
-                    <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    
-                    <!-- Filter by start time -->
-                    <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">From:</label>
-                    <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    
-                    <!-- Filter by end time -->
-                    <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">To:</label>
-                    <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    
-                    <!-- Enter nearest room for routing directions -->
-                    <label for="start_location" class="form-label" style="margin-top: 10px; font-weight: bold;">My location:</label>
-                    <select class="form-select" aria-label="Default select example" id="start_location" name="start_location">
-                        <option selected>Select nearest room</option>
-                        {% for index, row in rooms_df.iterrows() %}
-                        <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
-                        {% endfor %}
-                      </select>
-
-                    <!-- Select by size -->
-                    <label for="validationCustom01" class="form-label" style="margin-top: 10px; font-weight: bold;">Max. Room Size:</label>
-                    <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-
-                    <!-- Submit the form -->
-                    <div class="col">
-                        <button class="btn btn-success" type="submit" onclick="" name="button_filter_size" style="margin-top: 20px; width: 100px;">Search</button>
-                    </div>
-                </form>
-                
-                <!-- Button to clear all filters -->
-                <div>
-                    <form action="{{ url_for('clear_filters') }}" method="post">
-                        <button type="submit" class="btn btn-outline-secondary" style="margin-top: 10px; width: 100px;">Clear</button>
-                    </form>
+            <form action="{{ url_for('home') }}" method="post" novalidate>
+                <!-- Filter by date -->
+                <label for="start" class="form-label" style="margin-top: 10px; font-weight: bold;">Date:</label>
+                <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
+                <div class="valid-feedback">
+                    Looks good!
                 </div>
-            </div>
+                
+                <!-- Filter by start time -->
+                <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">From:</label>
+                <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                
+                <!-- Filter by end time -->
+                <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">To:</label>
+                <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                
+                <!-- Enter nearest room for routing directions -->
+                <label for="start_location" class="form-label" style="margin-top: 10px; font-weight: bold;">My location:</label>
+                <select class="form-select" aria-label="Default select example" id="start_location" name="start_location">
+                    <option selected>Select nearest room</option>
+                    {% for index, row in rooms_df.iterrows() %}
+                    <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Select by size -->
+                <label for="validationCustom01" class="form-label" style="margin-top: 10px; font-weight: bold;">Max. Room Size:</label>
+                <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+
+                <!-- Submit the form -->
+                <div class="col">
+                    <button class="btn btn-success" type="submit" onclick="" name="button_filter_size" style="margin-top: 20px; width: 100px;">Search</button>
+                </div>
+            </form>
+                
+            <!-- Button to clear all filters -->
+            <form action="{{ url_for('clear_filters') }}" method="post">
+                <button type="submit" class="btn btn-outline-secondary" style="margin-top: 10px; width: 100px;">Clear</button>
+            </form>
         </div>
 
         <!-- Rooms Column -->
         <div class="col-12 col-sm-9">
-            {% for index, row in rooms_df.iterrows() %}
-            <div class="card" style="margin: 15px;">
-                <div class="card-header" style="font-weight: bold;">
-                    {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}: {{ row['room_nr'] }}
-                </div>
+            <div name="filter_room_type" style="margin: 15px;">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <button class="nav-link active filter-btn" type="button" onclick="toggleFilter(this)" name="filter_all_rooms">All rooms</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_lecture_rooms">Lecture rooms</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_group_rooms">Group study rooms</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_studyspots">Studyspots</button>
+                    </li>
+                </ul>
+            </div>
 
-                <div class="card-body">
-                    <div class="row">
+            {% if filter_applied %}
+                {% for index, row in rooms_df.iterrows() %}
+                <div class="card" style="margin: 15px;">
+                    <div class="card-header" style="font-weight: bold;">
+                        {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}: {{ row['room_nr'] }}
+                    </div>
 
-                        <!-- Column 3: Free Until and Next event -->
-                        <div class="col border-end border-gray" style="text-align: left;">
-                            <p class="card-text">
-                                {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                                    Free until: {{ row['start_time'].strftime('%H:%M') }}
-                                {% endif %}
-                            </p>
-                            <p class="card-text">
-                                {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                                    Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
-                                {% else %}
-                                    {{ row['subject'] }}
-                                {% endif %}
-                            </p>
+                    <div class="card-body d-flex flex-column justify-content-between" style="padding: 10px;">
+                        <div class="row">
+                            <!-- Column 3: Free Until and Next event -->
+                            <div class="col border-end border-gray text-center">
+                                <p class="card-text">
+                                    {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                                        Free until: {{ row['start_time'].strftime('%H:%M') }}
+                                    {% endif %}
+                                </p>
+                                <p class="card-text">
+                                    {% if row['infoUrlText'] != 'Group meeting room'%}
+                                        {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                                            Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
+                                        {% else %}
+                                            {{ row['subject'] }}
+                                        {% endif %}
+                                    {% else %} 
+                                        <p style="text-align: center;">Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the link to
+                                        view availability and reserve group meeting rooms.
+                                        <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="margin-top: 10px; width: 200px;">Reserve</a>
+                                        </p>    
+                                    {% endif %}    
+                                </p>
+                            </div>
+
+                            <!-- Column 1: Room Name -->
+                            <div class="col-md-3 text-center d-flex flex-column align-items-center">
+                                <p class="card-text" style="padding-top: 10px; padding-bottom: 10px;">
+                                    <!-- Column 2: Number of Seats -->
+                                    {% if row['seats'] == None %}
+                                        Size: -
+                                    {% else %}
+                                        Size: {{ row['seats'] }}
+                                    {% endif %}
+                                </p>
+                                <!-- Column 5: More Details Button -->
+                                <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Route</button>
+                            </div>
                         </div>
-
-                        <!-- Column 1: Room Name -->
-                        <div class="col-md-3 text-center">
-                            
-                        
-                            <!-- Column 2: Number of Seats -->
-                            <p>
-                            {% if row['seats'] == None %}
-                                Size: -
-                            {% else %}
-                                Size: {{ row['seats'] }}
-                            {% endif %}
-                            </p>
-                            <!-- Column 5: More Details Button -->
-                            <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')">More Details</button>
-                        </div>
-            
-                
-                        
-                                
-                        
                     </div>
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
-         
     </div>
 </div>
-  
 
 <script>
     function redirectToRoomDetails(roomNr) {
         window.location.href = '/map?room_nr=' + roomNr;
     }
-</script>    
+
+    function toggleFilter(button) {
+        // Remove 'active' class from all buttons
+        $('.filter-btn').removeClass('active');
+
+        // Add 'active' class to the clicked button
+        $(button).addClass('active');
+
+        // Add your logic to handle the filter based on the clicked button
+        // For example, you can trigger an AJAX request or update the content dynamically
+    }
+</script>   
 {% endblock %}

@@ -25,6 +25,7 @@ app.secret_key = app.config['SECRET_KEY']
 #########################################################################################
 # WEBPAGES
 
+
 # Landing page with overview of room occupancy and filtering options
 @app.route("/", methods=['GET', 'POST'])
 def home():
@@ -45,6 +46,11 @@ def home():
     rounded_up_time = rounded_up_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
     rounded_up_time_str = rounded_up_time.strftime("%H:%M")
     
+    # Check if filter_applied is in session, if not, set it to False
+    filter_applied = session.get('filter_applied')
+    if filter_applied is None:
+        filter_applied = False  
+
     # Display landing page for current time with no filters applied
     if request.method == 'GET':
         
@@ -53,6 +59,9 @@ def home():
         session.setdefault('filter_end_time', rounded_up_time_str)
         session.setdefault('filter_date', current_date)
         session.setdefault('filter_size', np.inf)
+
+        # Set filter_applied to True in the session
+        session['filter_applied'] = False
         
         # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
         filter_size = session.get('filter_size')
@@ -67,7 +76,11 @@ def home():
         # Starting locations to select for routing
         start_locations = api.get_rooms()
 
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations)
+        # DELETE THESE: this is just for testing
+        print("Filter Applied:", filter_applied) 
+        print("Number of Rooms:", len(rooms_df))
+
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=filter_applied)
     
     # Apply filters and re-render template
     else:
@@ -132,13 +145,23 @@ def home():
         # Starting locations to select for directions
         start_locations = api.get_rooms()
 
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, start_locations=start_locations)
+        # Set filter_applied to True in the session
+        session['filter_applied'] = True
+
+        # DELETE THIS: this is just for testing
+        print("Filter Applied:", filter_applied)
+
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=filter_applied)
 
 # Route to clear filter session variables
 @app.route('/clear_filters', methods=['POST'])
 def clear_filters():
-    for key in list(session.keys()):
-        session.pop(key)
+    session.pop('filter_time', None)
+    session.pop('filter_end_time', None)
+    session.pop('filter_date', None)
+    session.pop('filter_size', None)
+    session.pop('current_loc', None)
+    session['filter_applied'] = False  # Set filter_applied to False in the session
     return redirect(url_for('home'))
 
 
@@ -163,15 +186,28 @@ def room():
 def map():
     rooms = api.get_rooms()
     start_room_nr = request.args.get('room_nr')
-    dest_room_nr = session['current_loc']
-    start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
-    dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
+    dest_room_nr = session.get('current_loc')
 
-    # Construct the iframe URL with your parameters
-    iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={start_poiId}&starttype=poi&start={dest_poiId}"
+    if start_room_nr is not None and dest_room_nr is not None:
+        start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
+        dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
 
-    # Pass the iframe URL to the template
-    return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId)
+        # Construct the iframe URL with your parameters
+        iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={start_poiId}&starttype=poi&start={dest_poiId}"
 
+        # Pass the iframe URL to the template
+        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId)
+    else:
+        # Provide more information for debugging
+        error_message = f"Invalid request: start_room_nr={start_room_nr}, dest_room_nr={dest_room_nr}"
+        return render_template('error.html', message=error_message)
+
+# Navbar routing to the other pages
+@app.route('/apology')
+def apology():
+    return render_template('apology.html')
+    
 if __name__ == '__main__':
     app.run(debug=True)
+
+
