@@ -142,23 +142,43 @@ def clear_filters():
     return redirect(url_for('home'))
 
 
-# Detailed schedule of a given room
-@app.route("/room", methods=['GET', 'POST'])
-def room():
-    if request.method == 'GET':
-        my_variable = ['This', 'is', 'a', 'quick', 'demo']
+#@app.route("/room4", methods=['GET', 'POST'])
+#def room_schedule():
+    current_time = dt.now()
+    rooms = api.get_rooms()
+    selected_room = None
+    room_schedule_df = pd.DataFrame()
 
-        # The render_template function will render the html file you see when calling the webpage by passing the variables and executing the logic you specified.
-        # Placeholders can be specified as seen below -> the expression before the comma refers to the variable as used in the HTML template, 
-        # the one after the comma to the variable as it's used in this Python script (Note, you don't have to name them the same but it helps with keeping track of your variable names).
-        return render_template('room.html', my_variable=my_variable)
-    
-    # If method = POST -> this route must be specified when you want to re-render a webpage based on the user's input
-    # e.g., when the user fills in and submits a form and you want to display changes to the webpages based on the input
-    # Have a look at how it's implemented in the landing page above and also have a look at how you have to specify the HTML forms in the "home.html" template to post to the page.
-    else:
-        return render_template('apology.html')
-    
+    if request.method == 'POST':
+        selected_room = request.form.get('selected_room')
+        # Hier rufen Sie die Funktion von Ihrer API-Klasse auf, um die Belegung des Raumes für den Rest des Tages zu erhalten
+        # Die Funktion könnte ähnlich wie get_free_rooms() sein, jedoch für einen spezifischen Raum
+        room_schedule_df = api.get_room_schedule(selected_room, current_time)
+
+    return render_template('room.html', rooms=rooms, selected_room=selected_room, room_schedule_df=room_schedule_df)
+
+#@app.route("/room3/<room_nr>", methods=['GET', 'POST'])
+#def room_schedule():
+    current_time = dt.now()
+    rooms = api.get_rooms()
+    selected_room = None
+    room_schedule_df = pd.DataFrame()
+
+    if request.method == 'POST':
+        selected_room = room_nr
+        # Hier rufen Sie die Funktion von Ihrer API-Klasse auf, um die Belegung des Raumes für den Rest des Tages zu erhalten
+        # Die Funktion könnte ähnlich wie get_free_rooms() sein, jedoch für einen spezifischen Raum
+        room_schedule_df = api.get_room_schedule(selected_room, current_time)
+
+    return render_template('room.html', rooms=rooms, selected_room=selected_room, room_schedule_df=room_schedule_df)
+
+from flask import flash
+@app.route("/room/<room_nr>", methods=['GET'])
+def room_schedule(room_nr):
+    room_events_sorted = ['Hello', 'World']
+    return render_template('room.html', room_nr=room_nr, room_schedule_df=room_events_sorted)
+
+
 @app.route('/map', methods=['GET'])
 def map():
     rooms = api.get_rooms()
