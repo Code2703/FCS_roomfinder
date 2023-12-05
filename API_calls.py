@@ -124,7 +124,7 @@ class API:
         rooms_df['end_time_only'] = rooms_df['end_time'].dt.time
         rooms_df['date'] = rooms_df['start_time'].dt.date
         rooms_df['date'] = pd.to_datetime(rooms_df['date'])
-        print(rooms_df)
+
         return rooms_df
     
     # def next_event(self, df, room_nr, filter_end, room_info):
