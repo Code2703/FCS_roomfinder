@@ -94,10 +94,19 @@ Home
                         {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}: {{ row['room_nr'] }}
                     </div>
 
-                    <div class="card-body d-flex flex-column justify-content-between" style="padding: 10px;">
+                    <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px;">
                         <div class="row">
+                            
                             <!-- Column 3: Free Until and Next event -->
-                            <div class="col border-end border-gray text-center">
+                            <div class="col border-end border-gray" style="text-align: left;">
+                                <p class="card-text">
+                                    <!-- Column 2: Number of Seats -->
+                                    {% if row['seats'] == None %}
+                                        Size: -
+                                    {% else %}
+                                        Size: {{ row['seats'] }}
+                                    {% endif %}
+                                </p>
                                 <p class="card-text">
                                     {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
                                         Free until: {{ row['start_time'].strftime('%H:%M') }}
@@ -110,10 +119,9 @@ Home
                                         {% else %}
                                             {{ row['subject'] }}
                                         {% endif %}
-                                    {% else %} 
-                                        <p style="text-align: center;">Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the link to
-                                        view availability and reserve group meeting rooms.
-                                        <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="margin-top: 10px; width: 200px;">Reserve</a>
+                                        {% else %} 
+                                        <p>Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the "Reserve" button 
+                                            to view availability and reserve group meeting rooms. Click on "Details" to access the map.
                                         </p>    
                                     {% endif %}    
                                 </p>
@@ -121,16 +129,18 @@ Home
 
                             <!-- Column 1: Room Name -->
                             <div class="col-md-3 text-center d-flex flex-column align-items-center">
-                                <p class="card-text" style="padding-top: 10px; padding-bottom: 10px;">
-                                    <!-- Column 2: Number of Seats -->
-                                    {% if row['seats'] == None %}
-                                        Size: -
-                                    {% else %}
-                                        Size: {{ row['seats'] }}
-                                    {% endif %}
-                                </p>
+                                <p class="card-text" style="padding-bottom: 10px;">
                                 <!-- Column 5: More Details Button -->
-                                <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Route</button>
+                                {% if row['infoUrlText'] != 'Group meeting room'%}
+                                    <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px; margin-top: 15px;">Details</button>
+                                {% else %}
+                                    <div>
+                                        <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Details</button> 
+                                    </div>
+                                    <div>
+                                        <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="width: 100px; margin-top: 10px;">Reserve</a>
+                                    </div>   
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -59,8 +59,9 @@ def home():
         session.setdefault('filter_end_time', rounded_up_time_str)
         session.setdefault('filter_date', current_date)
         session.setdefault('filter_size', np.inf)
+        session.setdefault('filter_applied', False)
 
-        # Set filter_applied to True in the session
+        # Set filter_applied to False in the session
         session['filter_applied'] = False
         
         # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
@@ -76,11 +77,7 @@ def home():
         # Starting locations to select for routing
         start_locations = api.get_rooms()
 
-        # DELETE THESE: this is just for testing
-        print("Filter Applied:", filter_applied) 
-        print("Number of Rooms:", len(rooms_df))
-
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=filter_applied)
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=session['filter_applied'])
     
     # Apply filters and re-render template
     else:
@@ -149,9 +146,9 @@ def home():
         session['filter_applied'] = True
 
         # DELETE THIS: this is just for testing
-        print("Filter Applied:", filter_applied)
+        print("Filter Applied:", session['filter_applied'])
 
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=filter_applied)
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=session['filter_applied'])
 
 # Route to clear filter session variables
 @app.route('/clear_filters', methods=['POST'])
