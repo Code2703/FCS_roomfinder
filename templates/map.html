@@ -6,47 +6,89 @@ Map
 
 
 {% block main %}
+
 <body>
-
+  <!-- Content Container: Container for the entire content, providing padding and left alignment -->
   <div class="container" style="padding: 20px; text-align: left;">
-    <a href="/" class="btn btn-outline-secondary" style="width: 200px;">Back to Overview</a>
+      <!-- Back to Overview Button: Button to navigate back to the overview page -->
+      <a href="/" class="btn btn-outline-secondary" style="width: 200px;">Back to Overview</a>
   </div>
 
+  <!-- Card Section: Section containing a Bootstrap card with relevant information -->
   <div class="card" style="margin-left: 20px;">
-    <div class="card-header" style="font-weight: bold;">
-      Room Number ??????
-    </div>
+      <!-- Card Header: Bold header displaying the room number (placeholder text) -->
+      <div class="card-header" style="font-weight: bold;">
+          Room Number ??????
+      </div>
 
-    <div class="card-body d-flex flex-column justify-content-between" style="padding: 10px;">
-        <div class="row">
-          <p class="card-text">
-            Size: 
-          </p>
-          <p class="card-text">
-            Location: 
-          </p><p class="card-text">
-            Other details: 
-          </p>
-          </p><p class="card-text">
-            Directions: 
-          </p>
-        </div>
-        <div class="row" style="padding: 15px;">
+      <!-- Card Body: Flex-column layout for card body content with padding -->
+      <div class="card-body d-flex flex-column justify-content-between" style="padding: 10px;">
 
+          <!-- Address Section: Row displaying the address information -->
+          <div class="row" style="padding: 15px;">
+              <p class="card-text" style="font-weight: bold;">
+                  Address: 
+              </p>
+          </div>
 
-          <!-- Embed the iframe -->
-          <iframe src="{{ iframe_url }}"
-            width="100%" height="720" frameborder="0" marginheight="0" marginwidth="0"
-            scrolling="no"></iframe>
+          <!-- Occupancy Section: Row displaying occupancy information -->
+          <div class="row" style="padding: 15px;">
+              <p class="card-text" style="font-weight: bold;">
+                  Occupancy: 
+              </p>
+          </div>
 
+          <!-- Equipment Section: Row displaying equipment information -->
+          <div class="row" style="padding: 15px;">
+              <p class="card-text" style="font-weight: bold;">
+                  Equipment: 
+              </p>
+          </div>
 
-        </div>
-    </div>
+          <!-- Booking Schedule Section: Row displaying booking schedule information -->
+          <div class="row" style="padding: 15px;">
+              <p class="card-text" style="font-weight: bold;">
+                  Booking schedule: 
+              </p>
+              <!-- Check if the room schedule is empty -->
+              {% if room_schedule_df.empty %}
+                  <!-- No scheduled events: Display a message indicating no events scheduled -->
+                  <p class="card-text">Currently, no scheduled events or classes in Room {{ room_nr }}. It seems to be free now!</p>
+              {% else %}
+                  <!-- Display schedule in a table: Display a table with event details -->
+                  <div class="table-responsive">
+                      <table class="table table-striped">
+                          <thead>
+                              <tr>
+                                  <th>Subject</th>
+                                  <th>Start Time</th>
+                                  <th>End Time</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <!-- Iterate through room_schedule_df to populate table rows -->
+                              {% for index, row in room_schedule_df.iterrows() %}
+                                  <tr>
+                                      <td>{{ row['subject'] }}</td>
+                                      <td>{{ row['start_time'].strftime('%H:%M') }}</td>
+                                      <td>{{ row['end_time'].strftime('%H:%M') }}</td>
+                                  </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              {% endif %}
+          </div>
+
+          <!-- Embed the iframe for Route Section: Row displaying route information with an embedded iframe -->
+          <div class="row" style="padding: 15px;">
+              <p class="card-text" style="font-weight: bold;">
+                  Route: 
+              </p>
+              <iframe src="{{ iframe_url }}" width="100%" height="720" frameborder="0" marginheight="0" marginwidth="0" scrolling="no"></iframe>
+          </div>
+      </div>
   </div>
-
-
-
-
 </body>
 </html>
 {% endblock %}

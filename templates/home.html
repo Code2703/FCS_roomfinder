@@ -5,6 +5,8 @@ Home
 {% endblock %}
 
 {% block main %}
+
+<!-- Introduction Section: Container for introductory text providing information about the room finder -->
 <div class="container text-center" style="padding: 20px;">
     <h3>You need space? We've got rooms!</h3>
     <p>Discovering the perfect study sanctuary on campus is now effortlessly at your fingertips! 
@@ -14,33 +16,35 @@ Home
     </p>
 </div>
 
+<!-- Filter and Search Section: Container for filtering options and search functionality -->
 <div class="container text-center">
     <div class="row align-items-start">
-        <!-- Filters Column -->
+        <!-- Filters Column: Form for applying various filters such as date, time, room size, and location -->
         <div class="col" style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; margin-top: 15px;">
             <form action="{{ url_for('home') }}" method="post" novalidate>
-                <!-- Filter by date -->
+
+                <!-- Filter by date: Input field for selecting the date -->
                 <label for="start" class="form-label" style="margin-top: 10px; font-weight: bold;">Date:</label>
                 <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
-                
-                <!-- Filter by start time -->
+
+                <!-- Filter by start time: Input field for selecting the start time -->
                 <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">From:</label>
                 <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
-                
-                <!-- Filter by end time -->
+
+                <!-- Filter by end time: Input field for selecting the end time -->
                 <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">To:</label>
                 <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
-                
-                <!-- Enter nearest room for routing directions -->
+
+                <!-- Enter nearest room for routing directions: Dropdown menu for selecting the nearest room -->
                 <label for="start_location" class="form-label" style="margin-top: 10px; font-weight: bold;">My location:</label>
                 <select class="form-select" aria-label="Default select example" id="start_location" name="start_location">
                     <option selected>Select nearest room</option>
@@ -49,27 +53,28 @@ Home
                     {% endfor %}
                 </select>
 
-                <!-- Select by size -->
+                <!-- Select by size: Input field for entering the maximum room size -->
                 <label for="validationCustom01" class="form-label" style="margin-top: 10px; font-weight: bold;">Max. Room Size:</label>
                 <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
 
-                <!-- Submit the form -->
+                <!-- Submit the form: Button to submit the filter form -->
                 <div class="col">
                     <button class="btn btn-success" type="submit" onclick="" name="button_filter_size" style="margin-top: 20px; width: 100px;">Search</button>
                 </div>
             </form>
-                
-            <!-- Button to clear all filters -->
+
+            <!-- Clear Filters Button: Form for clearing all filters and resetting the search -->
             <form action="{{ url_for('clear_filters') }}" method="post">
                 <button type="submit" class="btn btn-outline-secondary" style="margin-top: 10px; width: 100px;">Clear</button>
             </form>
         </div>
 
-        <!-- Rooms Column -->
+        <!-- Rooms Column: Container for displaying filtered rooms based on user preferences -->
         <div class="col-12 col-sm-9">
+            <!-- Room Type Filters: Navigation tabs for filtering rooms by type (e.g., Lecture rooms, Group study rooms) -->
             <div name="filter_room_type" style="margin: 15px;">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
@@ -87,20 +92,23 @@ Home
                 </ul>
             </div>
 
+            <!-- Display Filtered Rooms: Display cards for each room matching the applied filters -->
             {% if filter_applied %}
                 {% for index, row in rooms_df.iterrows() %}
                 <div class="card" style="margin: 15px;">
+                    <!-- Card Header: Display room name and number -->
                     <div class="card-header" style="font-weight: bold;">
                         {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}: {{ row['room_nr'] }}
                     </div>
 
+                    <!-- Card Body: Display room details and availability information -->
                     <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px;">
                         <div class="row">
                             
-                            <!-- Column 3: Free Until and Next event -->
+                            <!-- Column 3: Display room size, free until, and next event information -->
                             <div class="col border-end border-gray" style="text-align: left;">
                                 <p class="card-text">
-                                    <!-- Column 2: Number of Seats -->
+                                    <!-- Column 2: Display number of seats or room size -->
                                     {% if row['seats'] == None %}
                                         Size: -
                                     {% else %}
@@ -119,7 +127,7 @@ Home
                                         {% else %}
                                             {{ row['subject'] }}
                                         {% endif %}
-                                        {% else %} 
+                                    {% else %} 
                                         <p>Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the "Reserve" button 
                                             to view availability and reserve group meeting rooms. Click on "Details" to access the map.
                                         </p>    
@@ -127,20 +135,21 @@ Home
                                 </p>
                             </div>
 
-                            <!-- Column 1: Room Name -->
+                            <!-- Column 1: Display room name and provide details button -->
                             <div class="col-md-3 text-center d-flex flex-column align-items-center">
                                 <p class="card-text" style="padding-bottom: 10px;">
-                                <!-- Column 5: More Details Button -->
-                                {% if row['infoUrlText'] != 'Group meeting room'%}
-                                    <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px; margin-top: 15px;">Details</button>
-                                {% else %}
-                                    <div>
-                                        <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Details</button> 
-                                    </div>
-                                    <div>
-                                        <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="width: 100px; margin-top: 10px;">Reserve</a>
-                                    </div>   
-                                {% endif %}
+                                    <!-- Column 5: More Details Button -->
+                                    {% if row['infoUrlText'] != 'Group meeting room'%}
+                                        <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px; margin-top: 15px;">Details</button>
+                                    {% else %}
+                                        <div>
+                                            <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Details</button> 
+                                        </div>
+                                        <div>
+                                            <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="width: 100px; margin-top: 10px;">Reserve</a>
+                                        </div>   
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -150,6 +159,7 @@ Home
         </div>
     </div>
 </div>
+
 
 <script>
     function redirectToRoomDetails(roomNr) {
