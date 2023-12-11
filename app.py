@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime as dt
 from datetime import timedelta
-from API_calls import API
+from API_calls import API, euclidean_distance
+from scraper import seatfinder
 
 #########################################################################################
 # SET-UP
@@ -126,8 +127,16 @@ def home():
         if filter_size != np.inf:
             rooms_df = rooms_df.query(f'seats <= {filter_size}')
 
+        # Starting locations to select for directions
+        start_locations = api.get_rooms()
+        
         # Get current location
         current_loc = request.form['start_location']
+        current_coordinates = start_locations.query('room_nr == @current_loc')['point.coordinates'].values[0]
+        current_height = start_locations.query('room_nr == @current_loc')['z'].values[0]
+        
+        # Calculate euclidean distances to show closest rooms
+        rooms_df['distance'] = rooms_df.apply(lambda row: euclidean_distance([*row['point.coordinates'], row['z']*5], [*current_coordinates, current_height*5]), axis=1)
 
         # Set session variables to store filter configuration
         session['filter_time'] = filter_time
@@ -139,8 +148,6 @@ def home():
         # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
         filter_size_is_inf = filter_size == np.inf
         
-        # Starting locations to select for directions
-        start_locations = api.get_rooms()
 
         # Set filter_applied to True in the session
         session['filter_applied'] = True
@@ -148,7 +155,7 @@ def home():
         # DELETE THIS: this is just for testing
         print("Filter Applied:", session['filter_applied'])
 
-        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=session['filter_applied'])
+        return render_template('home.html', rooms_df=rooms_df.sort_values(by='distance'), filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=session['filter_applied'])
 
 # Route to clear filter session variables
 @app.route('/clear_filters', methods=['POST'])
@@ -161,24 +168,7 @@ def clear_filters():
     session['filter_applied'] = False  # Set filter_applied to False in the session
     return redirect(url_for('home'))
 
-
-# Detailed schedule of a given room
-# @app.route("/room", methods=['GET', 'POST'])
-# def room():
-#    if request.method == 'GET':
-#        my_variable = ['This', 'is', 'a', 'quick', 'demo']
-
-        # The render_template function will render the html file you see when calling the webpage by passing the variables and executing the logic you specified.
-        # Placeholders can be specified as seen below -> the expression before the comma refers to the variable as used in the HTML template, 
-        # the one after the comma to the variable as it's used in this Python script (Note, you don't have to name them the same but it helps with keeping track of your variable names).
-#        return render_template('room.html', my_variable=my_variable)
-    
-    # If method = POST -> this route must be specified when you want to re-render a webpage based on the user's input
-    # e.g., when the user fills in and submits a form and you want to display changes to the webpages based on the input
-    # Have a look at how it's implemented in the landing page above and also have a look at how you have to specify the HTML forms in the "home.html" template to post to the page.
-#    else:
-#        return render_template('apology.html')
-    
+# Display detailed information and directions for a selected room  
 @app.route('/map', methods=['GET'])
 def map():
     rooms = api.get_rooms()
@@ -242,6 +232,8 @@ def map():
     if room_events_sorted.empty:
         flash(f"No data available for room {start_room_nr}")
 
+    room_schedule_df = api.get_schedule(start_room_nr)
+
     #display map
     if start_room_nr is not None and dest_room_nr is not None:
         start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
@@ -257,12 +249,10 @@ def map():
         error_message = f"Invalid request: start_room_nr={start_room_nr}, dest_room_nr={dest_room_nr}"
         return render_template('error.html', message=error_message)
 
-
 # Navbar routing to apology
 @app.route('/apology')
 def apology():
     return render_template('apology.html')
-
 
 # Navbar routing to allRooms
 @app.route('/studySpots')
@@ -271,5 +261,3 @@ def allRooms():
     
 if __name__ == '__main__':
     app.run(debug=True)
-
-
