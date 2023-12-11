@@ -163,7 +163,7 @@ def clear_filters():
 
 
 # Detailed schedule of a given room
-# @app.route("/room", methods=['GET', 'POST'])
+@app.route("/room", methods=['GET', 'POST'])
 # def room():
 #    if request.method == 'GET':
 #        my_variable = ['This', 'is', 'a', 'quick', 'demo']
@@ -204,8 +204,8 @@ def map():
     room_events_sorted = room_events.sort_values(by='start_time')
 
     # Set the start time of the day and the end time of the day
-    start_of_day = datetime.now().replace(hour=7, minute=0, second=0, microsecond=0)
-    end_of_day = datetime.now().replace(hour=22, minute=0, second=0, microsecond=0)
+    start_of_day = dt.now().replace(hour=7, minute=0, second=0, microsecond=0)
+    end_of_day = dt.now().replace(hour=22, minute=0, second=0, microsecond=0)
 
     # Start with the start time of the day
     current_time = start_of_day
@@ -251,16 +251,21 @@ def map():
         iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={start_poiId}&starttype=poi&start={dest_poiId}"
 
         # Pass the iframe URL to the template
-        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId)
+        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId, room_nr=start_room_nr, room_schedule_df=room_events_sorted)
     else:
         # Provide more information for debugging
         error_message = f"Invalid request: start_room_nr={start_room_nr}, dest_room_nr={dest_room_nr}"
         return render_template('error.html', message=error_message)
 
-# Navbar routing to the other pages
+# Navbar routing to apology
 @app.route('/apology')
 def apology():
     return render_template('apology.html')
+
+# Navbar routing to allRooms
+@app.route('/allrooms')
+def allRooms():
+    return render_template('allRooms.html')
     
 if __name__ == '__main__':
     app.run(debug=True)

@@ -57,26 +57,30 @@ Map
               {% else %}
                   <!-- Display schedule in a table: Display a table with event details -->
                   <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th>Subject</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                        </tr>
-                        {% for index, row in room_schedule_df.iterrows() %}
-                        <tr>
-                          
-                            {% if row['subject'] == 'Great! The room is free for you to study in.' %}
-                              <td><strong>{{ row['subject'] }}</strong></td>
-                              <td><strong>{{ row['start_time'].strftime('%H:%M') }}</strong></td>
-                              <td><strong>{{ row['end_time'].strftime('%H:%M') }}</strong></td>
-                            {% else %}
-                              <td>{{ row['subject'] }}</td>
-                              <td>{{ row['start_time'].strftime('%H:%M') }}</td>
-                              <td>{{ row['end_time'].strftime('%H:%M') }}</td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
+                    <table class="table">
+                        <thead>  
+                            <tr>
+                                <th>Subject</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                            </tr>
+                        </thread>
+                        <tbody>
+                            {% for index, row in room_schedule_df.iterrows() %}
+                            <tr>
+                            
+                                {% if row['subject'] == 'Great! The room is free for you to study in.' %}
+                                <td>{{ row['subject'] }}</td>
+                                <td>{{ row['start_time'].strftime('%H:%M') }}</td>
+                                <td>{{ row['end_time'].strftime('%H:%M') }}</td>
+                                {% else %}
+                                <td>{{ row['subject'] }}</td>
+                                <td>{{ row['start_time'].strftime('%H:%M') }}</td>
+                                <td>{{ row['end_time'].strftime('%H:%M') }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
               {% endif %}
           </div>
