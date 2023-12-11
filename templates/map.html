@@ -1,17 +1,37 @@
 {% extends 'layout.html' %}
+
 {% block title %}
 Map
 {% endblock %}
 
-
-
 {% block main %}
-<body>
-    <h1>Directions</h1>
-    <!-- Embed the iframe -->
-    <iframe src="{{ iframe_url }}"
-      width="100%" height="720" frameborder="0" marginheight="0" marginwidth="0"
-      scrolling="no"></iframe>
-</body>
-</html>
+Back to Overview
+
+Room Number: {{ room_nr }}
+Address:
+Occupancy:
+Equipment:
+Booking schedule:
+
+{% if room_schedule_df.empty %}
+Currently, no scheduled events or classes in Room {{ room_nr }}. It seems to be free now!
+
+{% else %}
+<table>
+    <tr>
+        <th>Subject</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+    </tr>
+    {% for index, row in room_schedule_df.iterrows() %}
+    <tr>
+        <td>{{ row['subject'] }}</td>
+        <td>{{ row['start_time'].strftime('%H:%M') }}</td>
+        <td>{{ row['end_time'].strftime('%H:%M') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+Route:
+
 {% endblock %}
