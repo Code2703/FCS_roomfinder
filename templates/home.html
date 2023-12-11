@@ -69,7 +69,7 @@
                 {% if filter_applied %}
                     {% for index, row in rooms_df.iterrows() %}
                         <div class="card" style="margin: 15px;">
-                            <!-- Card Header: Display room name and number -->
+                            <!-- Card Header: Display room type and number -->
                             <div class="card-header" style="font-weight: bold;">
                                 {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}: {{ row['room_nr'] }}
                             </div>
@@ -77,10 +77,10 @@
                             <!-- Card Body: Display room details and availability information -->
                             <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px;">
                                 <div class="row">
-                                    <!-- Column 3: Display room size, free until, and next event information -->
+                                    <!-- Column 1: Display room size, free until, and next event information -->
                                     <div class="col border-end border-gray" style="text-align: left;">
                                         <p class="card-text">
-                                            <!-- Column 2: Display number of seats or room size -->
+                                            <!-- Display number of seats if available-->
                                             {% if row['seats'] == None %}
                                                 Capacity: -
                                             {% else %}
@@ -107,7 +107,7 @@
                                         </p>
                                     </div>
 
-                                    <!-- Column 1: Display room name and provide details button -->
+                                    <!-- Column 2: Provide details and reserve buttons -->
                                     <div class="col-md-3 text-center d-flex flex-column align-items-center">
                                         <p class="card-text" style="padding-bottom: 10px;">
                                             <!-- Column 5: More Details Button -->
