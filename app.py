@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, flash, render_template, request, session, redirect, url_for
 import requests
 import numpy as np
 import pandas as pd
@@ -164,27 +164,85 @@ def clear_filters():
 
 # Detailed schedule of a given room
 @app.route("/room", methods=['GET', 'POST'])
-def room():
-    if request.method == 'GET':
-        my_variable = ['This', 'is', 'a', 'quick', 'demo']
+# def room():
+#    if request.method == 'GET':
+#        my_variable = ['This', 'is', 'a', 'quick', 'demo']
 
         # The render_template function will render the html file you see when calling the webpage by passing the variables and executing the logic you specified.
         # Placeholders can be specified as seen below -> the expression before the comma refers to the variable as used in the HTML template, 
         # the one after the comma to the variable as it's used in this Python script (Note, you don't have to name them the same but it helps with keeping track of your variable names).
-        return render_template('room.html', my_variable=my_variable)
+#        return render_template('room.html', my_variable=my_variable)
     
     # If method = POST -> this route must be specified when you want to re-render a webpage based on the user's input
     # e.g., when the user fills in and submits a form and you want to display changes to the webpages based on the input
     # Have a look at how it's implemented in the landing page above and also have a look at how you have to specify the HTML forms in the "home.html" template to post to the page.
-    else:
-        return render_template('apology.html')
+#    else:
+#        return render_template('apology.html')
     
 @app.route('/map', methods=['GET'])
 def map():
     rooms = api.get_rooms()
     start_room_nr = request.args.get('room_nr')
     dest_room_nr = session.get('current_loc')
+    current_time = dt.now()
+    current_date = current_time.strftime("%Y-%m-%d")
 
+    # Display room occupancy
+    courses_today = api.get_courses(current_date)
+    # Filter out courses and events that take place in the specified room
+    if not isinstance(courses_today, pd.DataFrame):
+        flash("Error retrieving course data.")
+        return render_template('map.html', room_nr=start_room_nr, room_schedule_df=pd.DataFrame())
+    
+    # Convert start and end times to datetime, if not already done
+    courses_today['start_time'] = pd.to_datetime(courses_today['start_time'])
+    courses_today['end_time'] = pd.to_datetime(courses_today['end_time'])
+
+    # Filter courses and events that take place in the specified room
+    room_events = courses_today.query("room_nr == @start_room_nr and end_time >= @current_time")
+    # Sort events by their start time
+    room_events_sorted = room_events.sort_values(by='start_time')
+
+    # Set the start time of the day and the end time of the day
+    start_of_day = dt.now().replace(hour=7, minute=0, second=0, microsecond=0)
+    end_of_day = dt.now().replace(hour=22, minute=0, second=0, microsecond=0)
+
+    # Start with the start time of the day
+    current_time = start_of_day
+
+    # An empty list to collect new entries
+    new_entries = []
+
+    for index, row in room_events_sorted.iterrows():
+        if current_time < row['start_time']:
+            # There is a gap
+            new_entry = {
+                'start_time': current_time,
+                'end_time': row['start_time'],
+                'subject': 'Great! The room is free for you to study in.'
+            }
+            new_entries.append(new_entry)
+        
+        # Update the current time to the end of this event
+        current_time = row['end_time']
+
+    # Check after the last event
+    if current_time < end_of_day:
+        new_entry = {
+            'start_time': current_time,
+            'end_time': end_of_day,
+            'subject': 'Great! The room is free for you to study in.'
+        }
+        new_entries.append(new_entry)
+
+    # Add the new entries to the DataFrame
+    if new_entries:
+        room_events_sorted = pd.concat([room_events_sorted, pd.DataFrame(new_entries)]).sort_values(by='start_time').reset_index(drop=True)
+
+    if room_events_sorted.empty:
+        flash(f"No data available for room {start_room_nr}")
+
+    #display map
     if start_room_nr is not None and dest_room_nr is not None:
         start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
         dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
@@ -193,16 +251,21 @@ def map():
         iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={start_poiId}&starttype=poi&start={dest_poiId}"
 
         # Pass the iframe URL to the template
-        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId)
+        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId, room_nr=start_room_nr, room_schedule_df=room_events_sorted)
     else:
         # Provide more information for debugging
         error_message = f"Invalid request: start_room_nr={start_room_nr}, dest_room_nr={dest_room_nr}"
         return render_template('error.html', message=error_message)
 
-# Navbar routing to the other pages
+# Navbar routing to apology
 @app.route('/apology')
 def apology():
     return render_template('apology.html')
+
+# Navbar routing to allRooms
+@app.route('/allrooms')
+def allRooms():
+    return render_template('allRooms.html')
     
 if __name__ == '__main__':
     app.run(debug=True)

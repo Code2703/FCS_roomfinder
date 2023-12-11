@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Room-Details
+{% endblock %}
+
+<!-- START ADDING YOUR CONTENT HERE -->
+{% block main %}
+
+<!-- Section: Welcome and Introduction -->
+<div class="container text-center" style="padding: 20px;">
+    <h3>Unlock the Gateway to Your Ideal Space!</h3>
+    <p>Embark on a journey through our campus rooms, each a unique realm of possibilities! 🚀 
+        Explore the curated list below and discover the hidden gems that match your desires. From cozy nooks to expansive halls, 
+        your perfect space awaits with just a click. 🌟📚</p>
+</div>
+
+{% for index, row in rooms_df.iterrows() %}
+    <div class="card" style="margin: 15px;">
+        <!-- Card Header: Display room name and number -->
+        <div class="card-header" style="font-weight: bold;">
+            {{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}: {{ row['room_nr'] }}
+        </div>
+
+        <!-- Card Body: Display room details and availability information -->
+        <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px;">
+            <div class="row">
+                
+                <!-- Column 3: Display room size, free until, and next event information -->
+                <div class="col border-end border-gray" style="text-align: left;">
+                    <p class="card-text">
+                        <!-- Column 2: Display number of seats or room size -->
+                        {% if row['seats'] == None %}
+                            Size: -
+                        {% else %}
+                            Size: {{ row['seats'] }}
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                            Free until: {{ row['start_time'].strftime('%H:%M') }}
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        {% if row['infoUrlText'] != 'Group meeting room'%}
+                            {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
+                                Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
+                            {% else %}
+                                {{ row['subject'] }}
+                            {% endif %}
+                        {% else %} 
+                            <p>Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the "Reserve" button 
+                                to view availability and reserve group meeting rooms. Click on "Details" to access the map.
+                            </p>    
+                        {% endif %}    
+                    </p>
+                </div>
+
+                <!-- Column 1: Display room name and provide details button -->
+                <div class="col-md-3 text-center d-flex flex-column align-items-center">
+                    <p class="card-text" style="padding-bottom: 10px;">
+                        <!-- Column 5: More Details Button -->
+                        {% if row['infoUrlText'] != 'Group meeting room'%}
+                            <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px; margin-top: 15px;">Details</button>
+                        {% else %}
+                            <div>
+                                <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Details</button> 
+                            </div>
+                            <div>
+                                <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="width: 100px; margin-top: 10px;">Reserve</a>
+                            </div>   
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+
+{% endblock %}
