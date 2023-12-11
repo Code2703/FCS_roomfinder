@@ -6,13 +6,7 @@ Home
 
 {% block main %}
 
-<!-- Introduction Section: Container for introductory text providing information about the room finder -->
-<div class="container text-center" style="padding: 20px;">
-    <h3>Searching for Space? RoomRadar's Got You Covered!</h3>
-    <p>Exploring the ideal study spot on campus is now a breeze with RoomRadar! Just specify your desired maximum room size for a comfortable study environment, 
-        select the date and time, and watch RoomRadar reveal all the quiet spaces perfectly suited for you. Simplify and enhance your study sessions with precision! 📚✨
-    </p>
-</div>
+
 
 <!-- Filter and Search Section: Container for filtering options and search functionality -->
 <div class="container text-center">
@@ -24,23 +18,14 @@ Home
                 <!-- Filter by date: Input field for selecting the date -->
                 <label for="start" class="form-label" style="margin-top: 10px; font-weight: bold;">Date:</label>
                 <input type="date" class="form-control" name="filter_date" value="{{ filter_date }}" min="{{ min_date }}" max="{{ max_date }}" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
 
                 <!-- Filter by start time: Input field for selecting the start time -->
                 <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">From:</label>
                 <input type="time" class="form-control" name="filter_time" value="{{ filter_time }}" min="{{ min_time }}" max="{{ max_time }}" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
 
                 <!-- Filter by end time: Input field for selecting the end time -->
                 <label for="start_time" class="form-label" style="margin-top: 10px; font-weight: bold;">To:</label>
                 <input type="time" class="form-control" name="filter_end_time" value="{{ filter_end_time }}" min="{{ min_end_time }}" max="{{ max_end_time }}" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
 
                 <!-- Enter nearest room for routing directions: Dropdown menu for selecting the nearest room -->
                 <label for="start_location" class="form-label" style="margin-top: 10px; font-weight: bold;">My location:</label>
@@ -54,9 +39,7 @@ Home
                 <!-- Select by size: Input field for entering the maximum room size -->
                 <label for="validationCustom01" class="form-label" style="margin-top: 10px; font-weight: bold;">Max. Room Size:</label>
                 <input type="text" class="form-control" name="filter_size" value="{{ filter_size if not filter_size_is_inf else '' }}" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
+
 
                 <!-- Submit the form: Button to submit the filter form -->
                 <div class="col">
@@ -84,9 +67,6 @@ Home
                     <li class="nav-item">
                         <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_group_rooms">Group study rooms</button>
                     </li>
-                    <li class="nav-item">
-                        <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_studyspots">Studyspots</button>
-                    </li>
                 </ul>
             </div>
 
@@ -111,16 +91,6 @@ Home
                                         Capacity: -
                                     {% else %}
                                         Capacity: {{ row['seats'] }}
-                                    {% endif %}
-                                </p>
-                                <p class="card-text">
-                                    <!-- Column 2: Display current availability-->
-                                    {% if row['room_nr'] == '01-311' %}
-                                        Availability: /72
-                                    {% elif row['room_nr'] == '09-119' %}
-                                        Availability: /296
-                                    {% elif row['room_nr'] == '09-030' %}
-                                        Availability : /207    
                                     {% endif %}
                                 </p>
                                 <p class="card-text">

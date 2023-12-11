@@ -265,9 +265,9 @@ def apology():
 
 
 # Navbar routing to allRooms
-@app.route('/allrooms')
+@app.route('/studySpots')
 def allRooms():
-    return render_template('allRooms.html')
+    return render_template('studySpots.html')
     
 if __name__ == '__main__':
     app.run(debug=True)
