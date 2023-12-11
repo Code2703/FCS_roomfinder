@@ -267,11 +267,6 @@ def apology():
 # Navbar routing to allRooms
 @app.route('/allrooms')
 def allRooms():
-        
-        if request.method == 'GET':
-        
-            all_rooms = api.get_rooms()
-
     return render_template('allRooms.html')
     
 if __name__ == '__main__':
