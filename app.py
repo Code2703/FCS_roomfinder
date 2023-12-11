@@ -255,9 +255,16 @@ def apology():
     return render_template('apology.html')
 
 # Navbar routing to allRooms
-@app.route('/studySpots')
+@app.route('/allrooms')
 def allRooms():
-    return render_template('studySpots.html')
-    
+    return render_template('allRooms.html')
+
+@app.route('/seatfinder', methods=['GET'])
+def seatfinder():
+    # seats_df = seatfinder()
+    return render_template('layout.html')
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
