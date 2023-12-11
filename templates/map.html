@@ -77,7 +77,7 @@ Map
                     <!-- Check if the room schedule is empty -->
                     {% if room_schedule_df.empty %}
                         <!-- No scheduled events: Display a message indicating no events scheduled -->
-                        <p class="card-text">Currently, no scheduled events or classes in Room {{ room_nr }}. It seems to be free now!</p>
+                        <p class="card-text">Currently, no scheduled events or classes in Room {{ room_nr }}</p>
                     {% else %}
                         <!-- Display schedule in a table: Display a table with event details -->
                         <div class="table-responsive">

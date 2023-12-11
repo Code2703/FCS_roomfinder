@@ -5,6 +5,7 @@ from datetime import datetime as dt
 from datetime import timedelta
 import re
 from pandas import json_normalize
+import math
 
 
 class API:
@@ -195,6 +196,36 @@ class API:
         result_df = rooms_df.query("name in @included_name and not (infoUrlText in @excluded_infoUrlText or buildingName in @excluded_buildingName)").copy()
         return result_df
     
+    def get_schedule(self, room_nr, start_date=None):
+        """Returns a pandas dataframe containing all events taking place in the specified room for a given date."""
+        if start_date == None:
+            start_date = dt.now()
+            end_date = start_date + timedelta(days=1)
+            start_date = start_date.strftime('%Y-%m-%d')
+            end_date = end_date.strftime('%Y-%m-%d')
+        
+        url = f"https://integration.preprod.unisg.ch/eventapi/EventDates/permitted/byStartDate/{start_date}/byEndDate/{end_date}?page=1&limit=1000000&hal=false&envelope=false"
+
+        headers = {
+            "X-ApplicationId": self.api_token,
+            "API-Version": "3",
+            "X-RequestedLanguage": "en"
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.ok:
+            json_response = response.json()
+            print(json_response)
+            df = pd.DataFrame(json_response)
+        else:
+            print("Error encountered: ", response.status_code)
+
+        schedule = df[['location', 'startTime', 'endTime', 'description']].query('location == @room_nr')
+
+        return schedule
+
+    
     def old_rooms(self):
         """Returns a pandas dataframe containing all campus rooms of format xx-(U)xxx, including their capacity and system IDs. Note that some rooms have multiple IDs."""
         # API URL for Rooms
@@ -242,3 +273,8 @@ class API:
         campus_rooms_clean['seats'] = campus_rooms_clean['seats'].apply(lambda x: max(x))
 
         return campus_rooms_clean
+    
+def euclidean_distance(start_coordinates, end_coordinates):
+    x1, y1, z1 = start_coordinates
+    x2, y2, z2 = end_coordinates
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
