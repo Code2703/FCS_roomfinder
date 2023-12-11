@@ -108,9 +108,19 @@ Home
                                 <p class="card-text">
                                     <!-- Column 2: Display number of seats or room size -->
                                     {% if row['seats'] == None %}
-                                        Size: -
+                                        Capacity: -
                                     {% else %}
-                                        Size: {{ row['seats'] }}
+                                        Capacity: {{ row['seats'] }}
+                                    {% endif %}
+                                </p>
+                                <p class="card-text">
+                                    <!-- Column 2: Display current availability-->
+                                    {% if row['room_nr'] == '01-311' %}
+                                        Availability: /72
+                                    {% elif row['room_nr'] == '09-119' %}
+                                        Availability: /296
+                                    {% elif row['room_nr'] == '09-030' %}
+                                        Availability : /207    
                                     {% endif %}
                                 </p>
                                 <p class="card-text">
