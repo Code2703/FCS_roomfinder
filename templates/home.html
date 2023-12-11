@@ -79,20 +79,22 @@
                                 <div class="row">
                                     <!-- Column 1: Display room size, free until, and next event information -->
                                     <div class="col border-end border-gray" style="text-align: left;">
-                                        <p class="card-text">
-                                            <!-- Display number of seats if available-->
+                                        <!-- Display number of seats if available -->
+                                        <p class="card-text">                                            
                                             {% if row['seats'] == None %}
                                                 Capacity: -
                                             {% else %}
                                                 Capacity: {{ row['seats'] }}
                                             {% endif %}
                                         </p>
-                                        <p class="card-text">
+                                        <!-- Display availability -->
+                                        <p class="card-text">                                            
                                             {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
                                                 Free until: {{ row['start_time'].strftime('%H:%M') }}
                                             {% endif %}
                                         </p>
-                                        <p class="card-text">
+                                        <!-- For meeting rooms apology, for all other rooms state next event -->
+                                        <p class="card-text">                                            
                                             {% if row['infoUrlText'] != 'Group meeting room'%}
                                                 {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
                                                     Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
