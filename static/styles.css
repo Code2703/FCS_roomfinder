@@ -58,12 +58,23 @@ h5 {
     color: #2e944b62; /* Green color */
 }
 
-/* Normaler (nicht-hover) Zustand für nav-link */
+/* normal (not hover) color for nav-link */
 .nav-tabs .nav-item button.nav-link {
     color: #2e944b !important;
 }
  
-/* Hover-Effekt für nav-link */
+/* Hover-effect for nav-link */
 .nav-tabs .nav-item button.nav-link:hover {
     color: #2e944b62 !important;
+}
+
+/* colors for accordion */
+.accordion-flush .accordion-button:focus {
+    box-shadow: none;
+    background-color: white;
+    font-weight: bold;
+  }
+
+.accordion-flush .accordion-button {
+    font-weight: bold;
 }
