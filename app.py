@@ -163,7 +163,7 @@ def clear_filters():
 
 
 # Detailed schedule of a given room
-@app.route("/room", methods=['GET', 'POST'])
+# @app.route("/room", methods=['GET', 'POST'])
 # def room():
 #    if request.method == 'GET':
 #        my_variable = ['This', 'is', 'a', 'quick', 'demo']
@@ -257,14 +257,21 @@ def map():
         error_message = f"Invalid request: start_room_nr={start_room_nr}, dest_room_nr={dest_room_nr}"
         return render_template('error.html', message=error_message)
 
+
 # Navbar routing to apology
 @app.route('/apology')
 def apology():
     return render_template('apology.html')
 
+
 # Navbar routing to allRooms
 @app.route('/allrooms')
 def allRooms():
+        
+        if request.method == 'GET':
+        
+            all_rooms = api.get_rooms()
+
     return render_template('allRooms.html')
     
 if __name__ == '__main__':
