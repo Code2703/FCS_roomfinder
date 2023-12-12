@@ -57,7 +57,7 @@ api = API(app.config['API_TOKEN']) # Initialize instance of API with api_token
 # Second option, importing API_TOKEN from config.py
 api = API(API_TOKEN)
 ```
-#### Available Function:
+#### Available functions:
 The available functions for the API object are the following:
 | Name                                          | Description                                                                                                                                                   |
 |-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
