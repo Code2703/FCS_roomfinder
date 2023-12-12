@@ -57,7 +57,7 @@ api = API(app.config['API_TOKEN']) # Initialize instance of API with api_token
 # Second option, importing API_TOKEN from config.py
 api = API(API_TOKEN)
 ```
-
+#### Available Function:
 The available functions for the API object are the following:
 | Name                                          | Description                                                                                                                                                   |
 |-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -70,7 +70,7 @@ The available functions for the API object are the following:
 | `old_rooms(self)`                             | Returns a pandas dataframe containing all campus rooms of format xx-(U)xxx, including their capacity and system IDs. Note that some rooms have multiple IDs. Note: use the `get_rooms()` method instead, which accesses the MazeMap API and provides more room details. |
 
 
-### Calling api functions
+#### Calling API functions:
 ```python
 
 # Get all room information
