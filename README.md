@@ -5,7 +5,7 @@ With our project we set out to create an overview of study spots at the Universi
 
 ## Table of Contents
 
-#### Python
+### Python
 | Filename      | Description                                                        |
 |---------------|--------------------------------------------------------------------|
 | `app.py`      | Flask application, including all routes.                           |
@@ -16,7 +16,7 @@ With our project we set out to create an overview of study spots at the Universi
 
 
 
-#### HTML/CSS/JavaScript
+### HTML/CSS/JavaScript
 | Filename          | Description                                                                                                  |
 |-------------------|--------------------------------------------------------------------------------------------------------------|
 | `layout.html`     | Base layout, defines menu and logo                                                                           |
@@ -25,7 +25,7 @@ With our project we set out to create an overview of study spots at the Universi
 | `map.html`        | Displays detailed schedule, equipment, and location for a specified room. If a start-location is provided, directions are given. |
 
 
-#### General
+### General
 | Filename         | Description                                                                                                                                                              |
 |------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `config.py`      | Needs to be set up with API-Token for the API of the University of St.Gallen, an encryption key for the flask session cache, and the path to the browser-driver (see instructions below). |
@@ -42,7 +42,7 @@ Please refer to requirements.txt for the required modules and used versions (run
 
 ## Implementation Details
 
-#### Backend
+### Backend
 The app is set up around the `API` class defined in `API_calls.py`. An api object can be initialized as follows: `api = API(API_TOKEN)` 
 
 ```python
@@ -70,7 +70,7 @@ The available functions for the API object are the following:
 | `old_rooms(self)`                             | Returns a pandas dataframe containing all campus rooms of format xx-(U)xxx, including their capacity and system IDs. Note that some rooms have multiple IDs. Note: use the `get_rooms()` method instead, which accesses the MazeMap API and provides more room details. |
 
 
-#### Calling api functions
+### Calling api functions
 ```python
 
 # Get all room information
@@ -80,4 +80,4 @@ rooms_df = api.get_rooms()
 filtered_rooms = api.filter_rooms(rooms_df)
 ```
 
-#### Frontend
+### Frontend
