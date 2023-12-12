@@ -6,11 +6,12 @@ With our project we set out to create an overview of study spots at the Universi
 ## Table of Contents
 
 #### Python
-Filename       | Description
-----------------------------------------------
-app.py         | Flask application, including all routes.
-API_calls.py   | Defines API class, including functions used for API calls.
-scraper.py     | Selenium-based web-scraper used for scraping dynamically generated data.
+| Filename      | Description                                                        |
+|---------------|--------------------------------------------------------------------|
+| `app.py`      | Flask application, including all routes.                           |
+| `API_calls.py`| Defines API class, including functions used for API calls.         |
+| `scraper.py`  | Selenium-based web-scraper used for scraping dynamically generated data. |
+
 
 
 
