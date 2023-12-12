@@ -10,7 +10,7 @@ from scraper import seatfinder
 #########################################################################################
 # SET-UP
 
-# Set up application and connect database
+# Set up application
 app = Flask(__name__)
 
 # Read API_token from config.py file
@@ -285,7 +285,7 @@ def studyspots():
 
     return render_template('seatfinder.html', seatfinder_df=seatfinder_df, rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], 
                            filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, 
-                           start_locations=start_locations)
+                           start_locations=start_locations, filter_applied=session['filter_applied'])
 
 
 if __name__ == '__main__':

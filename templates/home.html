@@ -52,17 +52,17 @@
             <div class="col-12 col-sm-9">
                 <!-- Room Type Filters: Navigation tabs for filtering rooms by type (e.g., Lecture rooms, Group study rooms) -->
                 <div name="filter_room_type" style="margin: 15px;">
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item">
+                    <ul class="nav nav-tabs flex-column flex-sm-row">
+                        <li class="nav-item col-12 col-sm-auto">
                             <button class="nav-link active filter-btn" type="button" onclick="toggleFilter(this)" name="filter_all_rooms">All rooms</button>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item col-12 col-sm-auto">
                             <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_lecture_rooms">Lecture rooms</button>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item col-12 col-sm-auto">
                             <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_group_rooms">Group study rooms</button>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item col-12 col-sm-auto">
                             <button class="nav-link filter-btn" type="button" onclick="redirectToSeatfinder()">Study Zones</button>
                         </li>
                     </ul>
@@ -105,8 +105,10 @@
                                                     {{ row['subject'] }}
                                                 {% endif %}
                                             {% else %} 
-                                                <p>Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the "Reserve" button 
-                                                    to view availability and reserve group meeting rooms. Click on "Details" to access the map.
+                                                <p>Unfortunately, we can't access this information.
+                                                </p>    
+                                                <p>Please use the "Reserve" button 
+                                                    to view details and book a room.
                                                 </p>    
                                             {% endif %}    
                                         </p>
@@ -136,7 +138,7 @@
                 {% else %}
                     <!-- Display Logo upon new session load -->
                     <div class="col text-center">
-                        <img src="static\Logo.jpg" alt="Logo" class="mx-auto">
+                        <img src="static/Logo.jpg" alt="Logo" class="img-fluid mx-auto">
                     </div>
                 {% endif %}
             </div>

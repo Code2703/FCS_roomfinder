@@ -130,6 +130,8 @@ class API:
     
     # def next_event(self, df, room_nr, filter_end, room_info):
     def next_event(self, df, room_nr, filter_end):
+        """Returns a dataframe containing the next event for a specified room given the day's schedule.
+        Args: df -> dataframe returned by get_courses(); room_nr -> str; filter_end -> dt.strptime(filter_end_str, '%H:%M')"""
         room_events = df.query("room_nr == @room_nr and start_time.dt.time > @filter_end")
         if not room_events.empty:
             return room_events.sort_values(by='start_time').head(1)
@@ -189,6 +191,7 @@ class API:
         return result_df
     
     def filter_rooms(self, rooms_df):
+        """Excludes certain buildings and types of rooms"""
         included_name = ['Unterrichtsraum']
         excluded_infoUrlText = ['Dozierenden Lounge', 'theCo', 'theStage']
         # No visibility on individual rooms within square from hsg api

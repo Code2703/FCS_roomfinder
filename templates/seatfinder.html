@@ -52,17 +52,17 @@
             <div class="col-12 col-sm-9">
                 <!-- Room Type Filters: Navigation tabs for filtering rooms by type (e.g., Lecture rooms, Group study rooms) -->
                 <div name="filter_room_type" style="margin: 15px;">
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item">
-                            <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_all_rooms">All rooms</button>
+                    <ul class="nav nav-tabs flex-column flex-sm-row">
+                        <li class="nav-item col-12 col-sm-auto">
+                            <button class="nav-link filter-btn" type="button" onclick="redirectToHome()" name="filter_all_rooms">All rooms</button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_lecture_rooms">Lecture rooms</button>
+                        <li class="nav-item col-12 col-sm-auto">
+                            <button class="nav-link filter-btn" type="button" onclick="redirectToHome()" name="filter_lecture_rooms">Lecture rooms</button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_group_rooms">Group study rooms</button>
+                        <li class="nav-item col-12 col-sm-auto">
+                            <button class="nav-link filter-btn" type="button" onclick="redirectToHome()" name="filter_group_rooms">Group study rooms</button>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item col-12 col-sm-auto">
                             <button class="nav-link active filter-btn" type="button" onclick="redirectToSeatfinder()">Study Zones</button>
                         </li>
                     </ul>
@@ -81,14 +81,20 @@
                                 <div class="row">
                                     <div class="col border-end border-gray" style="text-align: left;">
                                         <!-- Column 1: Display room size, free until, and next event information -->
-                                        <div class="col-md-2 text-center d-flex flex-column justify-content-center align-items-center" style="font-size: 1.2em; height: 100%;">
-                                            {{ row['free'] }} / {{ row['free'] + row['occupied']}}
-                                        </div>                                    
+                                        {% if row['free'] == "-" %}
+                                            <div class="col-md-2 text-center d-flex flex-column justify-content-center align-items-center" style="font-size: 1em; height: 100%;">
+                                                No information available.
+                                            </div>
+                                        {% else %}                                    
+                                            <div class="col-md-2 text-center d-flex flex-column justify-content-center align-items-center" style="font-size: 1em; height: 100%;">
+                                                Occupancy: {{ row['free'] }} / {{ row['free'] + row['occupied']}}
+                                            </div>
+                                        {% endif %}                                    
                                     </div>
                                     <!-- Availability Bar -->
                                     <div class="col-md-10" style="display: flex; align-items: center; height: 35px;">
-                                        <div style="flex-grow: {{ row['free'] }}; flex-basis: 0; height: 35px; background-color: green;"></div>
-                                        <div style="flex-grow: {{ row['occupied'] }}; flex-basis: 0; height: 35px; background-color: red;"></div>
+                                        <div style="flex-grow: {{ row['free'] }}; flex-basis: 0; height: 20px; background-color: green;"></div>
+                                        <div style="flex-grow: {{ row['occupied'] }}; flex-basis: 0; height: 20px; background-color: red;"></div>
                                     </div>
                                     <!-- Column 2: Provide details and reserve buttons -->
                                 </div>
@@ -100,8 +106,8 @@
     </div>
 
     <script>
-        function redirectToRoomDetails(roomNr) {
-            window.location.href = '/map?room_nr=' + roomNr;
+        function redirectToHome() {
+            window.location.href = '/';
         }
         function redirectToSeatfinder() {
             window.location.href = '/seatfinder';
