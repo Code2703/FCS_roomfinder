@@ -6,52 +6,30 @@ With our project we set out to create an overview of study spots at the Universi
 ## Table of Contents
 
 #### Python
-| Filename              | Description                          |
----------------------------------------------------------------
-| app.py                | Flask application, incl. all routes  |
----------------------------------------------------------------
-| API_calls.py          | Defines API class, incl. functions   |
-|                       | used for API calls                   |
----------------------------------------------------------------
-| scraper.py            | Selenium-based web-scraper used for  |
-|                       | scraping dynamically generated data  |
----------------------------------------------------------------
+Filename       | Description
+----------------------------------------------
+app.py         | Flask application, including all routes.
+API_calls.py   | Defines API class, including functions used for API calls.
+scraper.py     | Selenium-based web-scraper used for scraping dynamically generated data.
+
 
 
 
 #### HTML/CSS/JavaScript
-| Filename              | Description                          |
----------------------------------------------------------------
-| layout.html           | Base layout, defines menu and logo   |
----------------------------------------------------------------
-| home.html             | Landing-page, displays routes for    |
-|                       | lecture rooms and group study rooms  |
----------------------------------------------------------------
-| seatfinder.html       | Displays information scraped from    | 
-|                       | <https://seatfinder.unisg.ch/> using |
-|                       | scraper.py                           |
----------------------------------------------------------------
-| map.html              | Displays detailed schedule, equipment| 
-|                       | and location for a specified room.   |
-|                       | If a start-location is provided,     |
-|                       | directions are given.                | 
----------------------------------------------------------------
+| Filename          | Description                                                                                                  |
+|-------------------|--------------------------------------------------------------------------------------------------------------|
+| `layout.html`     | Base layout, defines menu and logo                                                                           |
+| `home.html`       | Landing-page, displays routes for lecture rooms and group study rooms                                       |
+| `seatfinder.html` | Displays information scraped from <https://seatfinder.unisg.ch/> using `scraper.py`                          |
+| `map.html`        | Displays detailed schedule, equipment, and location for a specified room. If a start-location is provided, directions are given. |
+
 
 #### General
-| Filename              | Description                           |
-----------------------------------------------------------------
-| config.py             | Needs to be set up with API-Token for |
-|                       | the API of the University of          |
-|                       | St.Gallen, an encryption key          |
-|                       | for the flask session cache           |
-|                       | and the path to the browser-driver    |
-|                       | (see instructions below).             |
-----------------------------------------------------------------
-| requirement.txt       | Library dependencies and versions.    |
-----------------------------------------------------------------
-| .gitignore            | Ignore test.py and config.py when     |
-|                       | committing to remote repository.      |
-----------------------------------------------------------------
+| Filename         | Description                                                                                                                                                              |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `config.py`      | Needs to be set up with API-Token for the API of the University of St.Gallen, an encryption key for the flask session cache, and the path to the browser-driver (see instructions below). |
+| `requirement.txt`| Library dependencies and versions.                                                                                                                                       |
+| `.gitignore`     | Ignore `test.py` and `config.py` when committing to remote repository.                                                                                                   |
 
 ## Instructions and Dependencies
 To get the app running, please create a file 'config.py' in the same directory as app.py. In app.py, specify the following constants:
