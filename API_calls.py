@@ -200,10 +200,12 @@ class API:
         """Returns a pandas dataframe containing all events taking place in the specified room for a given date."""
         if start_date == None:
             start_date = dt.now()
-            end_date = start_date + timedelta(days=1)
-            start_date = start_date.strftime('%Y-%m-%d')
-            end_date = end_date.strftime('%Y-%m-%d')
         
+        end_date = start_date + timedelta(days=1)
+        start_date = start_date.strftime('%Y-%m-%d')
+        end_date = end_date.strftime('%Y-%m-%d')
+
+
         url = f"https://integration.preprod.unisg.ch/eventapi/EventDates/permitted/byStartDate/{start_date}/byEndDate/{end_date}?page=1&limit=1000000&hal=false&envelope=false"
 
         headers = {

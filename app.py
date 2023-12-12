@@ -131,13 +131,18 @@ def home():
         start_locations = api.get_rooms()
         
         # Get current location
-        current_loc = request.form['start_location']
-        current_coordinates = start_locations.query('room_nr == @current_loc')['point.coordinates'].values[0]
-        current_height = start_locations.query('room_nr == @current_loc')['z'].values[0]
+        try:
+            current_loc = request.form['start_location']
+        except:
+            current_loc = None
+        print(current_loc)
+        if current_loc != None:
+            current_coordinates = start_locations.query('room_nr == @current_loc')['point.coordinates'].values[0]
+            current_height = start_locations.query('room_nr == @current_loc')['z'].values[0]
         
-        # Calculate euclidean distances to show closest rooms
-        rooms_df['distance'] = rooms_df.apply(lambda row: euclidean_distance([*row['point.coordinates'], row['z']*5], [*current_coordinates, current_height*5]), axis=1)
-
+            # Calculate euclidean distances to show closest rooms
+            rooms_df['distance'] = rooms_df.apply(lambda row: euclidean_distance([*row['point.coordinates'], row['z']*5], [*current_coordinates, current_height*5]), axis=1)
+            rooms_df = rooms_df.sort_values(by='distance')
         # Set session variables to store filter configuration
         session['filter_time'] = filter_time
         session['filter_end_time'] = filter_end_time
@@ -155,7 +160,7 @@ def home():
         # DELETE THIS: this is just for testing
         print("Filter Applied:", session['filter_applied'])
 
-        return render_template('home.html', rooms_df=rooms_df.sort_values(by='distance'), filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=session['filter_applied'])
+        return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, start_locations=start_locations, filter_applied=session['filter_applied'])
 
 # Route to clear filter session variables
 @app.route('/clear_filters', methods=['POST'])
@@ -172,82 +177,54 @@ def clear_filters():
 @app.route('/map', methods=['GET'])
 def map():
     rooms = api.get_rooms()
-    start_room_nr = request.args.get('room_nr')
-    dest_room_nr = session.get('current_loc')
-    current_time = dt.now()
-    current_date = current_time.strftime("%Y-%m-%d")
-
+    start_room_nr = session.get('current_loc')
+    dest_room_nr = request.args.get('room_nr')
+    equipment = rooms.query('room_nr == @dest_room_nr')['description'].values[0]
+    if equipment != None:
+        equipment = equipment.split("\n")
     # Display room occupancy
-    courses_today = api.get_courses(current_date)
-    # Filter out courses and events that take place in the specified room
-    if not isinstance(courses_today, pd.DataFrame):
-        flash("Error retrieving course data.")
-        return render_template('map.html', room_nr=start_room_nr, room_schedule_df=pd.DataFrame())
+    date = session.get('filter_date')
+    courses_today = api.get_schedule(dest_room_nr, start_date=dt.strptime(date, '%Y-%m-%d'))
     
-    # Convert start and end times to datetime, if not already done
-    courses_today['start_time'] = pd.to_datetime(courses_today['start_time'])
-    courses_today['end_time'] = pd.to_datetime(courses_today['end_time'])
+    schedule = pd.DataFrame({'endTime':['09:00', '10:00', '11:00', '12:00','13:00', '14:00','15:00', '16:00','17:00', '18:00', '19:00', '20:00', '21:00', '22:00'], 
+                             'course':['-' for i in range(14)], 
+                             'startTime':['08:15', '09:15', '10:15', '11:15', '12:15', '13:15', '14:15', '15:15', '16:15', '17:15', '18:15', '19:15', '20:15', '21:15']}, 
+                             columns=['startTime', 'endTime', 'course']
+                             )
+    schedule['endTime'] = schedule['endTime'].apply(lambda x: dt.strptime(x, '%H:%M').time())
+    schedule['startTime'] = schedule['startTime'].apply(lambda x: dt.strptime(x, '%H:%M').time())
+    
+    courses_today['startTime'] = courses_today['startTime'].apply(lambda x: dt.strptime(x, '%Y-%m-%dT%H:%M:%S').time()) 
+    courses_today['endTime'] = courses_today['endTime'].apply(lambda x: dt.strptime(x, '%Y-%m-%dT%H:%M:%S').time()) 
 
-    # Filter courses and events that take place in the specified room
-    room_events = courses_today.query("room_nr == @start_room_nr and end_time >= @current_time")
-    # Sort events by their start time
-    room_events_sorted = room_events.sort_values(by='start_time')
+    for i in range(len(schedule)):
+        for k in range(len(courses_today)):
+            if courses_today['endTime'].iloc[k] > schedule['startTime'].iloc[i] and courses_today['startTime'].iloc[k] < schedule['endTime'].iloc[i]:
+                schedule['course'].iloc[i] = courses_today['description'].iloc[k]
 
-    # Set the start time of the day and the end time of the day
-    start_of_day = dt.now().replace(hour=7, minute=0, second=0, microsecond=0)
-    end_of_day = dt.now().replace(hour=22, minute=0, second=0, microsecond=0)
+    # Create a column to help identify consecutive blocks with the same course
+    schedule['group'] = ((schedule['course'] != schedule['course'].shift()) | (schedule['course'] == '-')).cumsum()
 
-    # Start with the start time of the day
-    current_time = start_of_day
+    # Aggregate the blocks
+    aggregated_schedule = schedule.groupby(['group', 'course'], as_index=False).agg({'startTime': 'first', 'endTime': 'last'}).reset_index(drop=True)
+    schedule = aggregated_schedule.drop(columns=['group'])
 
-    # An empty list to collect new entries
-    new_entries = []
-
-    for index, row in room_events_sorted.iterrows():
-        if current_time < row['start_time']:
-            # There is a gap
-            new_entry = {
-                'start_time': current_time,
-                'end_time': row['start_time'],
-                'subject': 'Great! The room is free for you to study in.'
-            }
-            new_entries.append(new_entry)
-        
-        # Update the current time to the end of this event
-        current_time = row['end_time']
-
-    # Check after the last event
-    if current_time < end_of_day:
-        new_entry = {
-            'start_time': current_time,
-            'end_time': end_of_day,
-            'subject': 'Great! The room is free for you to study in.'
-        }
-        new_entries.append(new_entry)
-
-    # Add the new entries to the DataFrame
-    if new_entries:
-        room_events_sorted = pd.concat([room_events_sorted, pd.DataFrame(new_entries)]).sort_values(by='start_time').reset_index(drop=True)
-
-    if room_events_sorted.empty:
-        flash(f"No data available for room {start_room_nr}")
-
-    room_schedule_df = api.get_schedule(start_room_nr)
-
-    #display map
+    # Display map
     if start_room_nr is not None and dest_room_nr is not None:
         start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
         dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
 
-        # Construct the iframe URL with your parameters
-        iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={start_poiId}&starttype=poi&start={dest_poiId}"
+        # Specify map configuration
+        iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={dest_poiId}&starttype=poi&start={start_poiId}"
 
         # Pass the iframe URL to the template
-        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId, room_nr=start_room_nr, room_schedule_df=room_events_sorted)
+        return render_template('map.html', iframe_url=iframe_url, start_poiId=start_poiId, dest_poiId=dest_poiId, room_nr=dest_room_nr, room_schedule_df=schedule, equipment=equipment, date=date)
     else:
+        dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
+        # Specify map configuration
+        iframe_url = f"http://use.mazemap.com/embed.html?campusid=710&typepois=36317&desttype=poi&dest={dest_poiId}"
         # Provide more information for debugging
-        error_message = f"Invalid request: start_room_nr={start_room_nr}, dest_room_nr={dest_room_nr}"
-        return render_template('error.html', message=error_message)
+        return render_template('map.html', iframe_url=iframe_url, dest_poiId=dest_poiId, room_nr=dest_room_nr, room_schedule_df=schedule, equipment=equipment, date=date)
 
 # Navbar routing to apology
 @app.route('/apology')
@@ -260,10 +237,55 @@ def allRooms():
     return render_template('allRooms.html')
 
 @app.route('/seatfinder', methods=['GET'])
-def seatfinder():
-    # seats_df = seatfinder()
-    return render_template('layout.html')
+def studyspots():
+    # Initialize variables
+    current_time = dt.now()
+    current_date = dt.now()
+    max_date = current_date + timedelta(days=30)
+    min_date = current_date - timedelta(days=30)
+    
+    # Format dates as strings
+    current_date = current_date.strftime("%Y-%m-%d")
+    max_date = max_date.strftime("%Y-%m-%d")
+    min_date = min_date.strftime("%Y-%m-%d")
 
+    # Round up to the next full hour
+    rounded_up_time = current_time + timedelta(minutes=30)
+    rounded_up_time = rounded_up_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    rounded_up_time_str = rounded_up_time.strftime("%H:%M")
+    
+    # Check if filter_applied is in session, if not, set it to False
+    filter_applied = session.get('filter_applied')
+    if filter_applied is None:
+        filter_applied = False  
+    
+    # Retrieve specified data from API
+    rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"), rounded_up_time_str)
+
+    # Filter lecture rooms
+    rooms_df = api.filter_rooms(rooms_df)
+
+    seatfinder_df = seatfinder()
+    # Set default session values
+    session.setdefault('filter_time', current_time.strftime("%H:%M"))
+    session.setdefault('filter_end_time', rounded_up_time_str)
+    session.setdefault('filter_date', current_date)
+    session.setdefault('filter_size', np.inf)
+    session.setdefault('filter_applied', False)
+
+    # Set filter_applied to False in the session
+    session['filter_applied'] = False
+    
+    # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
+    filter_size = session.get('filter_size')
+    filter_size_is_inf = filter_size == np.inf
+
+    # Starting locations to select for routing
+    start_locations = api.get_rooms()
+
+    return render_template('seatfinder.html', seatfinder_df=seatfinder_df, rooms_df=rooms_df, filter_date=session['filter_date'], filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], 
+                           filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, 
+                           start_locations=start_locations)
 
 
 if __name__ == '__main__':

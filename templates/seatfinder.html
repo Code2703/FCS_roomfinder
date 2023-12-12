@@ -54,7 +54,7 @@
                 <div name="filter_room_type" style="margin: 15px;">
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <button class="nav-link active filter-btn" type="button" onclick="toggleFilter(this)" name="filter_all_rooms">All rooms</button>
+                            <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_all_rooms">All rooms</button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_lecture_rooms">Lecture rooms</button>
@@ -63,82 +63,38 @@
                             <button class="nav-link filter-btn" type="button" onclick="toggleFilter(this)" name="filter_group_rooms">Group study rooms</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link filter-btn" type="button" onclick="redirectToSeatfinder()">Study Zones</button>
+                            <button class="nav-link active filter-btn" type="button" onclick="redirectToSeatfinder()">Study Zones</button>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Display Filtered Rooms: Display cards for each room matching the applied filters -->
-                {% if filter_applied %}
-                    {% for index, row in rooms_df.iterrows() %}
+                    <!-- Display Filtered Rooms: Display cards for each room matching the applied filters -->
+                    {% for index, row in seatfinder_df.iterrows() %}
                         <div class="card" style="margin: 15px;" data-room-type="{{ row['infoUrlText'] if row['infoUrlText'] == 'Group meeting room' else row['name'] }}">
                             <!-- Card Header: Display room type and number -->
                             <div class="card-header" style="font-weight: bold;">
-                                {{ 'Group Study Room' if row['infoUrlText'] == 'Group meeting room' else 'Lecture Room' }}: {{ row['room_nr'] }}
+                                {{ index }}
                             </div>
 
                             <!-- Card Body: Display room details and availability information -->
                             <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px;">
                                 <div class="row">
-                                    <!-- Column 1: Display room size, free until, and next event information -->
                                     <div class="col border-end border-gray" style="text-align: left;">
-                                        <!-- Display number of seats if available -->
-                                        <p class="card-text">                                            
-                                            {% if row['seats'] == None %}
-                                                Capacity: -
-                                            {% else %}
-                                                Capacity: {{ row['seats'] }}
-                                            {% endif %}
-                                        </p>
-                                        <!-- Display availability -->
-                                        <p class="card-text">                                            
-                                            {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                                                Free until: {{ row['start_time'].strftime('%H:%M') }}
-                                            {% endif %}
-                                        </p>
-                                        <!-- For meeting rooms apology, for all other rooms state next event -->
-                                        <p class="card-text">                                            
-                                            {% if row['infoUrlText'] != 'Group meeting room'%}
-                                                {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                                                    Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
-                                                {% else %}
-                                                    {{ row['subject'] }}
-                                                {% endif %}
-                                            {% else %} 
-                                                <p>Unfortunately, we aren't able to share availability data for group meeting rooms at the moment. Please use the "Reserve" button 
-                                                    to view availability and reserve group meeting rooms. Click on "Details" to access the map.
-                                                </p>    
-                                            {% endif %}    
-                                        </p>
+                                        <!-- Column 1: Display room size, free until, and next event information -->
+                                        <div class="col-md-2 text-center d-flex flex-column justify-content-center align-items-center" style="font-size: 1.2em; height: 100%;">
+                                            {{ row['free'] }} / {{ row['free'] + row['occupied']}}
+                                        </div>                                    
                                     </div>
-
+                                    <!-- Availability Bar -->
+                                    <div class="col-md-10" style="display: flex; align-items: center; height: 35px;">
+                                        <div style="flex-grow: {{ row['free'] }}; flex-basis: 0; height: 35px; background-color: green;"></div>
+                                        <div style="flex-grow: {{ row['occupied'] }}; flex-basis: 0; height: 35px; background-color: red;"></div>
+                                    </div>
                                     <!-- Column 2: Provide details and reserve buttons -->
-                                    <div class="col-md-3 text-center d-flex flex-column align-items-center">
-                                        <p class="card-text" style="padding-bottom: 10px;">
-                                            <!-- Column 5: More Details Button -->
-                                            {% if row['infoUrlText'] != 'Group meeting room'%}
-                                                <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px; margin-top: 15px;">Details</button>
-                                            {% else %}
-                                                <div>
-                                                    <button class="btn btn-success" type="button" onclick="redirectToRoomDetails('{{ row['room_nr'] }}')" style="width: 100px;">Details</button> 
-                                                </div>
-                                                <div>
-                                                    <a href="https://apps.unisg.ch/gmr/#" class="btn btn-outline-success" style="width: 100px; margin-top: 10px;">Reserve</a>
-                                                </div>   
-                                            {% endif %}
-                                        </p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
-
-                {% else %}
-                    <!-- Display Logo upon new session load -->
-                    <div class="col text-center">
-                        <img src="static\Logo.jpg" alt="Logo" class="mx-auto">
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
