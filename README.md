@@ -25,7 +25,7 @@ Introducing RoomRadar, our solution offers students a unified and comprehensive 
 | `home.html`       | Landing-page, displays routes for lecture rooms and group study rooms                                       |
 | `seatfinder.html` | Displays information scraped from <https://seatfinder.unisg.ch/> using `scraper.py`                          |
 | `map.html`        | Displays detailed schedule, equipment, and location for a specified room. If a start-location is provided, directions are given. |
-| `styles.cc`       | Changes the style of certain html elements                         |
+| `styles.css`       | Changes the style of specified html elements                         |
 
 
 ### General
@@ -84,5 +84,6 @@ filtered_rooms = api.filter_rooms(rooms_df)
 ```
 
 ### Frontend
-The app leverages Bootstrap (<https://getbootstrap.com/docs/5.3/getting-started/introduction/>) for a seamless user experience with a sleek and simple design. A form allows the user to set criteria including date, timeframe, current location and max. room size. Upon form submission the user can view a list of rooms displayed as an individual card with corresponding room details as well as a link to view more details and the MazeMap. 
-The combination of bootstrap elements including the form, navbar, accordion as well as various buttons allows the user to interact with the webpage. 
+The application utilizes Bootstrap (<https://getbootstrap.com/docs/5.3/getting-started/introduction/>) to create a smooth and user-friendly experience featuring a polished and straightforward design. Users can input criteria, such as date, timeframe, current location, and maximum room size, using a form. Once the form is submitted, a list of rooms is presented in the form of individual cards, each displaying relevant room details. Additionally, users can access a link for more comprehensive information and navigate through the MazeMap.
+
+The incorporation of Bootstrap elements, including the form, navbar, accordion, and various buttons, enhances user interaction with the webpage, providing a cohesive and engaging platform.
