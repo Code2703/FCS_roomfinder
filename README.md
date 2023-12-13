@@ -21,11 +21,11 @@ Introducing RoomRadar, our solution offers students a unified and comprehensive 
 ### HTML/CSS/JavaScript
 | Filename          | Description                                                                                                  |
 |-------------------|--------------------------------------------------------------------------------------------------------------|
-| `layout.html`     | Base layout, defines menu and logo                                                                           |
-| `home.html`       | Landing-page, displays routes for lecture rooms and group study rooms                                       |
+| `layout.html`     | Base layout, defines menu and logo.                                                                           |
+| `home.html`       | Landing-page, displays routes for lecture rooms and group study rooms.                                       |
 | `seatfinder.html` | Displays information scraped from <https://seatfinder.unisg.ch/> using `scraper.py`                          |
 | `map.html`        | Displays detailed schedule, equipment, and location for a specified room. If a start-location is provided, directions are given. |
-| `styles.css`       | Changes the style of specified html elements                         |
+| `styles.css`       | Changes the style of specified html elements.                         |
 
 
 ### General
