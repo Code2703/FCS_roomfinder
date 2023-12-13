@@ -1,7 +1,9 @@
 # RoomRadar
 
 ## Project Description
-With our project we set out to create an overview of study spots at the University of St. Gallen. Such spots include Group Study Rooms, Study Zones (e.g., the library and coworking spaces) and empty lecture rooms. Currently, there are separate pages for booking Group Study Rooms and viewing the capacity of the Study Zones. For lecture rooms, no overview exists at all. Our Web-App introduces the latter and creates a consolidated view.
+Our project was conceived with the aim of simplifying the process of finding study spots at the University of St. Gallen. Previously, students had to navigate through a multitude of different websites to access information about the availability of various study spaces, ranging from group meeting rooms and libraries to coworking spaces. However, a crucial piece of the puzzle was often overlooked – the lecture rooms. When could these spaces be utilized for focused study sessions?
+
+Introducing RoomRadar, our solution offers students a unified and comprehensive overview of all potential study spots on campus, encompassing even the availability of empty lecture rooms. With RoomRadar, we've streamlined the information-gathering process, providing students with a one-stop platform to plan their study sessions efficiently and effectively. 
 
 ## Table of Contents
 
@@ -23,6 +25,7 @@ With our project we set out to create an overview of study spots at the Universi
 | `home.html`       | Landing-page, displays routes for lecture rooms and group study rooms                                       |
 | `seatfinder.html` | Displays information scraped from <https://seatfinder.unisg.ch/> using `scraper.py`                          |
 | `map.html`        | Displays detailed schedule, equipment, and location for a specified room. If a start-location is provided, directions are given. |
+| `styles.cc`       | Changes the style of certain html elements                         |
 
 
 ### General
@@ -81,3 +84,5 @@ filtered_rooms = api.filter_rooms(rooms_df)
 ```
 
 ### Frontend
+The app leverages Bootstrap (<https://getbootstrap.com/docs/5.3/getting-started/introduction/>) for a seamless user experience with a sleek and simple design. A form allows the user to set criteria including date, timeframe, current location and max. room size. Upon form submission the user can view a list of rooms displayed as an individual card with corresponding room details as well as a link to view more details and the MazeMap. 
+The combination of bootstrap elements including the form, navbar, accordion as well as various buttons allows the user to interact with the webpage. 
