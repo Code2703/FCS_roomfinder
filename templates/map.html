@@ -47,21 +47,31 @@ Map
                     <thead>  
                       <tr>
                         <th class="col-sm-2">Time</th>
-                        <th class="col-sm-8">Subject</th>
-                        <th class="col-sm-2">Action</th>
+                        <th class="col-sm-8">Occupancy</th>
+                        <th class="col-sm-2">Book</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for index, row in room_schedule_df.iterrows() %}
                       <tr>
                         <td>{{ row['startTime'].strftime('%H:%M') }} - {{ row['endTime'].strftime('%H:%M') }}</td>
-                        <td>{{ row['course'] }}</td>
+                        {% if row['course'] == '-' %}
+                          {% if row['booking_count'] != 0 %}
+                            <td><img src="static/icon.png" alt="Icon" style="width: 33px; height: 33px;"> {{ row['booking_count'] | int }}</td>
+                            {% else %}
+                            <td>-</td>
+                          {% endif %}
+                        {% else %}
+                          <td>{{ row['course'] }}</td>
+                        {% endif %}
                         <td>
                           {% if row['course'] == '-' %}
                             <!-- Default button -->
-                            <button class="btn btn-outline-success" style="width: 100px;">Book</button>
-                            <!-- Alternative button for smaller screens -->
-                            <button class="alternative-btn btn btn-outline-success" id="alternative-btn">Book</button>
+                            <form action="/book_room" method="post">
+                              <input type="hidden" name="room_nr" value="{{ room_nr }}">
+                              <input type="hidden" name="time_slot" value="{{ row['startTime'].strftime('%H:%M') }}">
+                              <button type="submit" class="btn btn-outline-success">Book</button>
+                            </form>                          
                           {% else %}
                             <button class="btn btn-outline-secondary" disabled style="width: 100px;border-color: white;">-</button>
                           {% endif %}

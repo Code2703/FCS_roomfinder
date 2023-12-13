@@ -6,6 +6,7 @@ from datetime import datetime as dt
 from datetime import timedelta
 from API_calls import API, euclidean_distance
 from scraper import seatfinder
+from flask_sqlalchemy import SQLAlchemy
 
 #########################################################################################
 # SET-UP
@@ -22,6 +23,25 @@ api = API(app.config['API_TOKEN'])
 # Set secret key for session variables
 app.secret_key = app.config['SECRET_KEY']
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///schedule.db'
+
+# Intitialize database
+db = SQLAlchemy(app)
+
+# Create database model
+class Booking(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_nr = db.Column(db.String(10), nullable=False)
+    time_slot = db.Column(db.String(10), nullable=False)
+    booking_count = db.Column(db.Integer, default=0)
+
+    def __repr__(self):
+        return f'<Booking {self.room_nr} {self.time_slot}>'
+
+# Create an application context
+with app.app_context():
+    # Create the tables in the database
+    db.create_all()
 
 #########################################################################################
 # WEBPAGES
@@ -178,7 +198,14 @@ def clear_filters():
 def map():
     rooms = api.get_rooms()
     start_room_nr = session.get('current_loc')
+    
+    # Get destination room_nr from form or session variable in case of redirect (from /book_room)
     dest_room_nr = request.args.get('room_nr')
+    if dest_room_nr is not None:
+        session['dest_room_nr'] = dest_room_nr
+    else:
+        dest_room_nr = session.get('dest_room_nr')
+    
     equipment = rooms.query('room_nr == @dest_room_nr')['description'].values[0]
     if equipment != None:
         equipment = equipment.split("\n")
@@ -208,6 +235,14 @@ def map():
     # Aggregate the blocks
     aggregated_schedule = schedule.groupby(['group', 'course'], as_index=False).agg({'startTime': 'first', 'endTime': 'last'}).reset_index(drop=True)
     schedule = aggregated_schedule.drop(columns=['group'])
+
+    for index, row in schedule.iterrows():
+        time_slot = row['startTime'].strftime('%H:%M')
+        booking = Booking.query.filter_by(room_nr=dest_room_nr, time_slot=time_slot).first()
+        if booking:
+            schedule.at[index, 'booking_count'] = booking.booking_count
+        else:
+            schedule.at[index, 'booking_count'] = 0
 
     # Display map
     if start_room_nr is not None and dest_room_nr is not None:
@@ -282,6 +317,20 @@ def studyspots():
                            filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, 
                            start_locations=start_locations, filter_applied=session['filter_applied'])
 
+@app.route('/book_room', methods=['POST'])
+def book_room():
+    room_nr = request.form['room_nr']
+    time_slot = request.form['time_slot']
+
+    booking = Booking.query.filter_by(room_nr=room_nr, time_slot=time_slot).first()
+    if booking:
+        booking.booking_count += 1
+    else:
+        new_booking = Booking(room_nr=room_nr, time_slot=time_slot, booking_count=1)
+        db.session.add(new_booking)
+    db.session.commit()
+    
+    return redirect(url_for('map')) 
 
 if __name__ == '__main__':
     app.run(debug=True)
