@@ -231,11 +231,6 @@ def map():
 def apology():
     return render_template('apology.html')
 
-# Navbar routing to allRooms
-@app.route('/allrooms')
-def allRooms():
-    return render_template('allRooms.html')
-
 @app.route('/seatfinder', methods=['GET'])
 def studyspots():
     # Initialize variables

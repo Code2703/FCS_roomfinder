@@ -86,4 +86,4 @@ filtered_rooms = api.filter_rooms(rooms_df)
 ### Frontend
 The application utilizes Bootstrap (<https://getbootstrap.com/docs/5.3/getting-started/introduction/>) to create a smooth and user-friendly experience featuring a polished and straightforward design. Users can input criteria, such as date, timeframe, current location, and maximum room size, using a form. Once the form is submitted, a list of rooms is presented in the form of individual cards, each displaying relevant room details. Additionally, users can access a link for more comprehensive information and navigate through the MazeMap.
 
-The incorporation of Bootstrap elements, including the form, navbar, accordion, and various buttons, enhances user interaction with the webpage, providing a cohesive and engaging platform.
+The incorporation of Bootstrap elements, including the form, filters, accordion, and various buttons, enhances user interaction with the webpage, providing a cohesive and engaging platform.
