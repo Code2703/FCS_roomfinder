@@ -42,30 +42,26 @@ Map
                 <p class="card-text">Currently, no scheduled events or classes in Room {{ room_nr }}</p>
                 {% else %}
                 <!-- Display schedule in a table: Display a table with event details -->
-                <div class="table-responsive">
-                  <style>
-                    .table td, .table th {
-                      vertical-align: middle; /* Center align vertically */
-                      height: 50px;           /* Set a fixed height for all cells */
-                    }
-                  </style>
-              
+                <div class="table-responsive">       
                   <table class="table">
                     <thead>  
                       <tr>
-                        <th class="col-3 col-md-2">Time</th>
-                        <th class="col-6 col-md-8">Subject</th>
-                        <th class="col-3 col-md-2">Action</th>
+                        <th class="col-sm-2">Time</th>
+                        <th class="col-sm-8">Subject</th>
+                        <th class="col-sm-2">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for index, row in room_schedule_df.iterrows() %}
                       <tr>
-                        <td style="font-weight: 300; font-size:0.9rem;">{{ row['startTime'].strftime('%H:%M') }} - {{ row['endTime'].strftime('%H:%M') }}</td>
+                        <td>{{ row['startTime'].strftime('%H:%M') }} - {{ row['endTime'].strftime('%H:%M') }}</td>
                         <td>{{ row['course'] }}</td>
                         <td>
                           {% if row['course'] == '-' %}
+                            <!-- Default button -->
                             <button class="btn btn-outline-success" style="width: 100px;">Book</button>
+                            <!-- Alternative button for smaller screens -->
+                            <button class="alternative-btn btn btn-outline-success" id="alternative-btn">Book</button>
                           {% else %}
                             <button class="btn btn-outline-secondary" disabled style="width: 100px;border-color: white;">-</button>
                           {% endif %}
@@ -79,6 +75,7 @@ Map
               </div>
             </div>
           </div>
+          
           <!-- Equipment Section: Row displaying equipment information -->
             <div class="accordion-item">
                 <h2 class="accordion-header">
@@ -130,6 +127,64 @@ Map
         </div>
 
   </div>
+
+  <style>
+    .table td, .table th {
+        vertical-align: middle;
+        height: 50px;
+    }
+
+    /* Alternative button styling for smaller screens */
+    .alternative-btn {
+        display: none; /* Initially hide the alternative button */
+        font-size: 10.5px;
+        width: 40px;
+        padding: 4px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        margin: 4px;
+    }
+
+    /* Media query for screens with width up to 350 pixels */
+    @media screen and (max-width: 350px) {
+        /* Adjust the styling for smaller screens */
+        th {
+            font-size: 12px;
+            padding-bottom: 0px;
+        }
+
+        td {
+          font-size: 10.5px;
+        }
+
+        /* Hide the default button on smaller screens */
+        .btn {
+            display: none;
+        }
+
+        /* Show the alternative button on smaller screens */
+        .alternative-btn {
+            display: inline-block;
+        }
+
+        .table td:first-child {
+            width: 50px; /* Adjust the width of the first column */
+        }
+    }
+
+    /* Media query for screens with width greater than 350 pixels */
+    @media screen and (min-width: 351px) {
+        /* Show the default button on wider screens */
+        .btn {
+            display: inline-block;
+        }
+
+        /* Hide the alternative button on wider screens */
+        .alternative-btn {
+            display: none;
+        }
+    }
+  </style>
 </body>
 </html>
 {% endblock %}
