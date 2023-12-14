@@ -8,8 +8,7 @@ from API_calls import API, euclidean_distance
 from scraper import seatfinder
 from flask_sqlalchemy import SQLAlchemy
 
-#########################################################################################
-# SET-UP
+##### SET-UP ##############################################################################
 
 # Set up application
 app = Flask(__name__)
@@ -23,35 +22,30 @@ api = API(app.config['API_TOKEN'])
 # Set secret key for session variables
 app.secret_key = app.config['SECRET_KEY']
 
+# Intitialize sqlite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///schedule.db'
-
-# Intitialize database
 db = SQLAlchemy(app)
 
-# Create database model
+# Create database schema for room booking (see route: /book_room)
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     room_nr = db.Column(db.String(10), nullable=False)
     time_slot = db.Column(db.String(10), nullable=False)
-    booking_count = db.Column(db.Integer, default=0)
+    booking_count = db.Column(db.Integer, default=0) # Counter of number of bookings for a given room_nr and time_slot
 
     def __repr__(self):
         return f'<Booking {self.room_nr} {self.time_slot}>'
 
-# Create an application context
+# Set up database in the application context
 with app.app_context():
-    # Create the tables in the database
-    db.create_all()
+    db.create_all() # Create all tables outlined above
 
-#########################################################################################
-# WEBPAGES
-
+##### ROUTES ###############################################################################
 
 # Landing page with overview of room occupancy and filtering options
 @app.route("/", methods=['GET', 'POST'])
 def home():
-
-    # Initialize variables
+    # Initialize variables for filter settings
     current_time = dt.now()
     current_date = dt.now()
     max_date = current_date + timedelta(days=30)
@@ -62,19 +56,19 @@ def home():
     max_date = max_date.strftime("%Y-%m-%d")
     min_date = min_date.strftime("%Y-%m-%d")
 
-    # Round up to the next full hour
-    rounded_up_time = current_time + timedelta(minutes=30)
-    rounded_up_time = rounded_up_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    # Default filtering timeframe set to at least 30min: current time until ((current time + 30min) rounded to next full hour)
+    rounded_up_time = current_time + timedelta(minutes=30) # Add 30min to current time
+    rounded_up_time = rounded_up_time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1) # Round to next full hour
     rounded_up_time_str = rounded_up_time.strftime("%H:%M")
     
-    # Check if filter_applied is in session, if not, set it to False
-    filter_applied = session.get('filter_applied')
+    # Filte to not display any rooms if no filter is applied 
+    filter_applied = session.get('filter_applied') # Check if filter_applied is in session, if not, set it to False
     if filter_applied is None:
         filter_applied = False  
 
     # Display landing page for current time with no filters applied
     if request.method == 'GET':
-        
+
         # Set default session values
         session.setdefault('filter_time', current_time.strftime("%H:%M"))
         session.setdefault('filter_end_time', rounded_up_time_str)
@@ -85,14 +79,14 @@ def home():
         # Set filter_applied to False in the session
         session['filter_applied'] = False
         
-        # Create mask for handling variables in HTML and Jinja2 (np.inf not available in Jinja2)
+        # Create mask for handling filter size in HTML and Jinja2 (np.inf not available in Jinja2)
         filter_size = session.get('filter_size')
         filter_size_is_inf = filter_size == np.inf
 
         # Retrieve specified data from API
         rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"), rounded_up_time_str)
 
-        # Filter lecture rooms
+        # Filter lecture rooms to exclude unwanted buildings and room types
         rooms_df = api.filter_rooms(rooms_df)
 
         # Starting locations to select for routing

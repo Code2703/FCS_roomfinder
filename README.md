@@ -3,7 +3,7 @@
 ## Project Description
 Our project was conceived with the aim of simplifying the process of finding study spots at the University of St. Gallen. Previously, students had to navigate through a multitude of different websites to access information about the availability of various study spaces, ranging from group meeting rooms and libraries to coworking spaces. However, a crucial piece of the puzzle was often overlooked – the lecture rooms. When could these spaces be utilized for focused study sessions?
 
-Introducing RoomRadar, our solution offers students a unified and comprehensive overview of all potential study spots on campus, encompassing even the availability of empty lecture rooms. With RoomRadar, we've streamlined the information-gathering process, providing students with a one-stop platform to plan their study sessions efficiently and effectively. 
+Introducing RoomRadar, our solution offers students a unified and comprehensive overview of all potential study spots on campus, encompassing even the availability of empty lecture rooms. In addition, the booking feature allows students to "reserve" lecture rooms during their off-times. While not officially enforceable, this facilitates coordination among students looking for a quiet spot. With RoomRadar, we've streamlined the information-gathering process, providing students with a one-stop platform to plan their study sessions efficiently and effectively. 
 
 ## Table of Contents
 
@@ -82,6 +82,10 @@ rooms_df = api.get_rooms()
 # Exclude inaccessible buildings and rooms
 filtered_rooms = api.filter_rooms(rooms_df)
 ```
+
+#### Filtering
+
+#### Room Booking
 
 ### Frontend
 The application utilizes Bootstrap (<https://getbootstrap.com/docs/5.3/getting-started/introduction/>) to create a smooth and user-friendly experience featuring a polished and straightforward design. Users can input criteria, such as date, timeframe, current location, and maximum room size, using a form. Once the form is submitted, a list of rooms is presented in the form of individual cards, each displaying relevant room details. Additionally, users can access a link for more comprehensive information and navigate through the MazeMap.
