@@ -26,10 +26,17 @@
                     <!-- Enter nearest room for routing directions: Dropdown menu for selecting the nearest room -->
                     <label for="start_location" class="form-label" style="margin-top: 10px; font-weight: bold;">My location:</label>
                     <select class="form-select" aria-label="Default select example" id="start_location" name="start_location">
-                        <option disabled selected>Select nearest room</option>
-                        {% for index, row in rooms_df.sort_values(by='room_nr').iterrows() %}
-                            <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
-                        {% endfor %}
+                        {% if current_loc == None %}
+                            <option disabled selected>Select nearest room</option>
+                            {% for index, row in rooms_df.sort_values(by='room_nr').iterrows() %}
+                                <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option selected>{{ current_loc }}</option>
+                            {% for index, row in rooms_df.sort_values(by='room_nr').iterrows() %}
+                                <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
+                            {% endfor %}
+                        {% endif %}
                     </select>
 
                     <!-- Select by size: Input field for entering the maximum room size -->
@@ -83,24 +90,17 @@
                                     <!-- Column 1: Display room size, free until, and next event information -->
                                     <div class="col border-end border-gray" style="text-align: left;">
                                         <!-- Display number of seats if available -->
-                                        <p class="card-text">                                            
-                                            {% if row['seats'] == None %}
-                                                Capacity: -
-                                            {% else %}
-                                                Capacity: {{ row['seats'] }}
-                                            {% endif %}
-                                        </p>
                                         <!-- Display availability -->
                                         <p class="card-text">                                            
                                             {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                                                Free until: {{ row['start_time'].strftime('%H:%M') }}
+                                                <b>Free until</b>: {{ row['start_time'].strftime('%H:%M') }}
                                             {% endif %}
                                         </p>
                                         <!-- For meeting rooms apology, for all other rooms state next event -->
                                         <p class="card-text">                                            
                                             {% if row['infoUrlText'] != 'Group meeting room'%}
                                                 {% if row['start_time'].strftime('%Y-%m-%d %H:%M:%S') != '1970-01-01 00:00:00' %}
-                                                    Next Event: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
+                                                    <b>Next Event</b>: {{ row['subject'] }} ({{ row['start_time'].strftime('%H:%M') }} - {{ row['end_time'].strftime('%H:%M') }})
                                                 {% else %}
                                                     {{ row['subject'] }}
                                                 {% endif %}
@@ -109,6 +109,13 @@
                                                     to view availability details and book a room.
                                                 </p>    
                                             {% endif %}    
+                                        </p>
+                                        <p class="card-text">                                            
+                                            {% if row['seats'] == None %}
+                                            <img src="static/cap_icon.png" style="width: 33px;height: 33px;">&nbsp; No information.
+                                            {% else %}
+                                            <img src="static/cap_icon.png" style="width: 33px;height: 33px;">&nbsp; {{ row['seats'] | int }}
+                                            {% endif %}
                                         </p>
                                     </div>
 
