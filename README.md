@@ -83,7 +83,7 @@ rooms_df = api.get_rooms()
 filtered_rooms = api.filter_rooms(rooms_df)
 ```
 
-#### Filtering
+#### Client-Side Filtering
 
 #### Room Booking
 
