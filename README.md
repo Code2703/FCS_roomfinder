@@ -5,6 +5,7 @@ Our project was conceived with the aim of simplifying the process of finding stu
 
 Introducing RoomRadar, our solution offers students a unified and comprehensive overview of all potential study spots on campus, encompassing even the availability of empty lecture rooms. In addition, the booking feature allows students to "reserve" lecture rooms during their off-times. While not officially enforceable, this facilitates coordination among students looking for a quiet spot. With RoomRadar, we've streamlined the information-gathering process, providing students with a one-stop platform to plan their study sessions efficiently and effectively. 
 
+
 ## Table of Contents
 
 ### Python
@@ -83,11 +84,15 @@ rooms_df = api.get_rooms()
 filtered_rooms = api.filter_rooms(rooms_df)
 ```
 
-#### Client-Side Filtering
-
-#### Room Booking
-
 ### Frontend
 The application utilizes Bootstrap (<https://getbootstrap.com/docs/5.3/getting-started/introduction/>) to create a smooth and user-friendly experience featuring a polished and straightforward design. Users can input criteria, such as date, timeframe, current location, and maximum room size, using a form. Once the form is submitted, a list of rooms is presented in the form of individual cards, each displaying relevant room details. Additionally, users can access a link for more comprehensive information and navigate through the MazeMap.
 
 The incorporation of Bootstrap elements, including the form, filters, accordion, and various buttons, enhances user interaction with the webpage, providing a cohesive and engaging platform.
+
+## Troubleshooting
+
+#### API availability
+On weekends and from time to time during weeks, the API does not respond. During the week, this is usually limited to relatively short timeframes. On Sundays, the API was unavailable the whole day at times.
+
+#### Chrome Driver Version Incompatibility
+Ensure your Chrome Driver Version is compatible with the Version of Chrome you are using to access the '/seatfinder.html' route.

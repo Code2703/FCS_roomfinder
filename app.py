@@ -209,13 +209,16 @@ def map():
     else:
         dest_room_nr = session.get('dest_room_nr')
     
+    # Get equipment information from rooms dataframe
     equipment = rooms.query('room_nr == @dest_room_nr')['description'].values[0]
     if equipment != None:
         equipment = equipment.split("\n")
-    # Display room occupancy
+
+    # Get all courses taking place in the specified room on a given date
     date = session.get('filter_date')
     courses_today = api.get_schedule(dest_room_nr, start_date=dt.strptime(date, '%Y-%m-%d'))
     
+    # Create base schedule of 45min blocks throughout the day
     schedule = pd.DataFrame({'endTime':['09:00', '10:00', '11:00', '12:00','13:00', '14:00','15:00', '16:00','17:00', '18:00', '19:00', '20:00', '21:00', '22:00'], 
                              'course':['-' for i in range(14)], 
                              'startTime':['08:15', '09:15', '10:15', '11:15', '12:15', '13:15', '14:15', '15:15', '16:15', '17:15', '18:15', '19:15', '20:15', '21:15']}, 
@@ -227,6 +230,7 @@ def map():
     courses_today['startTime'] = courses_today['startTime'].apply(lambda x: dt.strptime(x, '%Y-%m-%dT%H:%M:%S').time()) 
     courses_today['endTime'] = courses_today['endTime'].apply(lambda x: dt.strptime(x, '%Y-%m-%dT%H:%M:%S').time()) 
 
+    # Assign courses to pre-defined time-slots of the schedule dataframe by comparing start- and end-times
     for i in range(len(schedule)):
         for k in range(len(courses_today)):
             if courses_today['endTime'].iloc[k] > schedule['startTime'].iloc[i] and courses_today['startTime'].iloc[k] < schedule['endTime'].iloc[i]:
@@ -235,10 +239,12 @@ def map():
     # Create a column to help identify consecutive blocks with the same course
     schedule['group'] = ((schedule['course'] != schedule['course'].shift()) | (schedule['course'] == '-')).cumsum()
 
-    # Aggregate the blocks
+    # Aggregate the blocks by grouping according to the same course to simplify table
+    # but maintain hourly slots where rooms are empty for easier booking (by the hour)
     aggregated_schedule = schedule.groupby(['group', 'course'], as_index=False).agg({'startTime': 'first', 'endTime': 'last'}).reset_index(drop=True)
     schedule = aggregated_schedule.drop(columns=['group'])
 
+    # Query database for booking entries and assign to booking_count; where empty, assign 0
     for index, row in schedule.iterrows():
         time_slot = row['startTime'].strftime('%H:%M')
         booking = Booking.query.filter_by(room_nr=dest_room_nr, time_slot=time_slot).first()
@@ -247,7 +253,7 @@ def map():
         else:
             schedule.at[index, 'booking_count'] = 0
 
-    # Display map
+    # Display map by passing key-word args (start and destination poiId)
     if start_room_nr is not None and dest_room_nr is not None:
         start_poiId = rooms.query('room_nr == @start_room_nr')['poiId'].iloc[0]
         dest_poiId = rooms.query('room_nr == @dest_room_nr')['poiId'].iloc[0]
@@ -320,11 +326,14 @@ def studyspots():
                            filter_size=session['filter_size'], max_date=max_date, min_date=min_date, filter_size_is_inf=filter_size_is_inf, rounded_up_time_str=rounded_up_time_str, 
                            start_locations=start_locations, filter_applied=session['filter_applied'])
 
+# Route to handle room booking
 @app.route('/book_room', methods=['POST'])
 def book_room():
+    # Retrieve information on booked room from form
     room_nr = request.form['room_nr']
     time_slot = request.form['time_slot']
 
+    # Add database-entry using time-slot and room_nr
     booking = Booking.query.filter_by(room_nr=room_nr, time_slot=time_slot).first()
     if booking:
         booking.booking_count += 1
