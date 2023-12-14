@@ -13,6 +13,8 @@ Map
   <div class="container" style="padding: 20px; text-align: left;">
       <!-- Back to Overview Button: Button to navigate back to the overview page -->
       <a href="/" class="btn btn-outline-secondary" style="width: 200px;">Back to Overview</a>
+      <!-- alternative back to overview button: for smaller screens -->
+      <a href="/" class="alternative-btn btn btn-outline-secondary" style="width: 200px; font-size: 12px;">Back to Overview</a>
   </div>
 
   <!-- Card Section: Section containing a Bootstrap card with relevant information -->
@@ -47,7 +49,7 @@ Map
                     <thead>  
                       <tr>
                         <th class="col-sm-2">Time</th>
-                        <th class="col-sm-8">Occupancy</th>
+                        <th class="col-sm-8">Booked for</th>
                         <th class="col-sm-2">Book</th>
                       </tr>
                     </thead>
@@ -57,7 +59,7 @@ Map
                         <td>{{ row['startTime'].strftime('%H:%M') }} - {{ row['endTime'].strftime('%H:%M') }}</td>
                         {% if row['course'] == '-' %}
                           {% if row['booking_count'] != 0 %}
-                            <td><img src="static/icon.png" alt="Icon" style="width: 33px; height: 33px;"> {{ row['booking_count'] | int }}</td>
+                            <td><img src="static/icon.png" alt="Icon" > {{ row['booking_count'] | int }}</td>
                             {% else %}
                             <td>-</td>
                           {% endif %}
@@ -70,10 +72,16 @@ Map
                             <form action="/book_room" method="post">
                               <input type="hidden" name="room_nr" value="{{ room_nr }}">
                               <input type="hidden" name="time_slot" value="{{ row['startTime'].strftime('%H:%M') }}">
-                              <button type="submit" class="btn btn-outline-success">Book</button>
+                              <button type="submit" class="btn btn-outline-success">Book</button>                              
+                            </form>
+                            <!-- Alternative button for smaller screens -->
+                            <form action="/book_room" method="post">
+                              <input type="hidden" name="room_nr" value="{{ room_nr }}">
+                              <input type="hidden" name="time_slot" value="{{ row['startTime'].strftime('%H:%M') }}">
+                              <button class="alternative-btn btn btn-outline-success" id="alternative-btn">Book</button>                             
                             </form>                          
                           {% else %}
-                            <button class="btn btn-outline-secondary" disabled style="width: 100px;border-color: white;">-</button>
+                            <button class="btn btn-outline-secondary" disabled style="width: 100px; border-color: white;">-</button>
                           {% endif %}
                         </td>
                       </tr>
@@ -155,8 +163,14 @@ Map
         margin: 4px;
     }
 
-    /* Media query for screens with width up to 350 pixels */
-    @media screen and (max-width: 350px) {
+    /* default icon size */
+    td img {
+        width: 33px; 
+        height: 33px;
+    }
+
+    /* Media query for screens with width up to 400 pixels */
+    @media screen and (max-width: 400px) {
         /* Adjust the styling for smaller screens */
         th {
             font-size: 12px;
@@ -165,6 +179,12 @@ Map
 
         td {
           font-size: 10.5px;
+        }
+
+        /* icon size on smaller screens */
+        td img {
+        width: 20px; 
+        height: 20px; 
         }
 
         /* Hide the default button on smaller screens */
@@ -180,10 +200,14 @@ Map
         .table td:first-child {
             width: 50px; /* Adjust the width of the first column */
         }
+
+        .table td:last-child {
+            width: 60px; /* Adjust the width of the first column */
+        }
     }
 
     /* Media query for screens with width greater than 350 pixels */
-    @media screen and (min-width: 351px) {
+    @media screen and (min-width: 401px) {
         /* Show the default button on wider screens */
         .btn {
             display: inline-block;
