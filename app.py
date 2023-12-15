@@ -83,14 +83,25 @@ def home():
         filter_size_is_inf = filter_size == np.inf
 
         # Retrieve specified data from API
-        rooms_df = api.get_free_rooms(current_time.strftime(format="%H:%M"), rounded_up_time_str)
+        rooms_df = api.get_free_rooms(session['filter_time'], session['filter_end_time'])
 
         # Filter lecture rooms to exclude unwanted buildings and room types
         rooms_df = api.filter_rooms(rooms_df)
 
         # Starting locations to select for routing
         start_locations = api.get_rooms()
+        
+        # Applying distance filter in case there is a current_loc in session
+        current_loc = session['current_loc']
+        if current_loc != None:
+            current_coordinates = start_locations.query('room_nr == @current_loc')['point.coordinates'].values[0]
+            current_height = start_locations.query('room_nr == @current_loc')['z'].values[0]
 
+            # Calculate euclidean distances to show closest rooms
+            rooms_df['distance'] = rooms_df.apply(lambda row: euclidean_distance([*row['point.coordinates'], row['z']*5], [*current_coordinates, current_height*5]), axis=1)
+            rooms_df = rooms_df.sort_values(by='distance')
+
+        start_locations = api.filter_rooms(start_locations)
         return render_template('home.html', rooms_df=rooms_df, filter_date=session['filter_date'], 
                                filter_time=session['filter_time'], filter_end_time=session['filter_end_time'], 
                                filter_size=session['filter_size'], max_date=max_date, min_date=min_date, 
@@ -147,13 +158,14 @@ def home():
 
         # Starting locations to select for directions
         start_locations = api.get_rooms()
-        
+        start_locations = api.filter_rooms(start_locations)
+
         # Get current location
         try:
             current_loc = request.form['start_location']
         except:
             current_loc = None
-        print(current_loc)
+        
         if current_loc != None:
             current_coordinates = start_locations.query('room_nr == @current_loc')['point.coordinates'].values[0]
             current_height = start_locations.query('room_nr == @current_loc')['z'].values[0]

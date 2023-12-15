@@ -28,13 +28,13 @@
                     <select class="form-select" aria-label="Default select example" id="start_location" name="start_location">
                         {% if current_loc == None %}
                             <option disabled selected>Select nearest room</option>
-                            {% for index, row in rooms_df.sort_values(by='room_nr').iterrows() %}
+                            {% for index, row in start_locations.sort_values(by='room_nr').iterrows() %}
                                 <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
                             {% endfor %}
                         {% else %}
                             <option selected>{{ current_loc }}</option>
-                            {% for index, row in rooms_df.sort_values(by='room_nr').iterrows() %}
-                                <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
+                            {% for index, row in start_locations.sort_values(by='room_nr').iterrows() %}
+                            <option value="{{ row['room_nr'] }}">{{ row['room_nr'] }}</option>
                             {% endfor %}
                         {% endif %}
                     </select>
