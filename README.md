@@ -96,3 +96,6 @@ On weekends and from time to time during weeks, the API does not respond. During
 
 #### Chrome Driver Version Incompatibility
 Ensure your Chrome Driver Version is compatible with the Version of Chrome you are using to access the '/seatfinder.html' route.
+
+#### Accessing the Website from Edoroam
+Note that it is currently not possible to access the Website when connected to Eduroam WiFi.
