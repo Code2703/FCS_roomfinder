@@ -77,24 +77,24 @@
                             </div>
 
                             <!-- Card Body: Display room details and availability information -->
-                            <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px;">
+                            <div class="card-body d-flex flex-column justify-content-between" style="padding: 15px; margin-top: 5px;">
                                 <div class="row">
-                                    <div class="col border-end border-gray" style="text-align: left;">
+                                    <div class="col-md-3 text-center d-flex flex-column align-items-center border-end border-gray" style="padding-top: 3px;">
                                         <!-- Column 1: Display room size, free until, and next event information -->
                                         {% if row['free'] == "-" %}
-                                            <div class="col-md-2 text-center d-flex flex-column justify-content-center align-items-center" style="font-size: 1em; height: 100%;">
+                                            <p class="card-text">
                                                 No information available.
-                                            </div>
+                                            </p>
                                         {% else %}                                    
-                                            <div class="col-md-2 text-center d-flex flex-column justify-content-center align-items-center" style="font-size: 1em; height: 100%;">
+                                            <p class="card-text">
                                                 Occupancy: {{ row['free'] }} / {{ row['free'] + row['occupied']}}
-                                            </div>
+                                            </p>
                                         {% endif %}                                    
                                     </div>
                                     <!-- Availability Bar -->
-                                    <div class="col-md-10" style="display: flex; align-items: center; height: 35px;">
-                                        <div style="flex-grow: {{ row['free'] }}; flex-basis: 0; height: 20px; background-color: green;"></div>
-                                        <div style="flex-grow: {{ row['occupied'] }}; flex-basis: 0; height: 20px; background-color: red;"></div>
+                                    <div class="col" style="display: flex; align-items: center; height: 35px; margin-left: 10px; margin-right: 10px;">
+                                        <div style="flex-grow: {{ row['occupied'] }}; flex-basis: 0; height: 20px; background-color: #a3291e; border-top-left-radius: 5px; border-bottom-left-radius: 5px;"></div>
+                                        <div style="flex-grow: {{ row['free'] }}; flex-basis: 0; height: 20px; background-color: #2e944b; border-top-right-radius: 5px; border-bottom-right-radius: 5px;"></div>
                                     </div>
                                     <!-- Column 2: Provide details and reserve buttons -->
                                 </div>
