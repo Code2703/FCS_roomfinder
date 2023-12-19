@@ -130,13 +130,12 @@ Map
                   <div id="flush-collapseRoute" class="accordion-collapse collapse show">
                 <div class="accordion-body">
                     <!-- Embed the iframe for Route Section: Row displaying route information with an embedded iframe -->
-                    <div style="position: relative; overflow: hidden; width: 100%; padding-top: 177%;"> <!-- Aspect Ratio Box -->
+                    <div class="responsive-iframe" style="position: relative; overflow: hidden; width: 100%; padding-top: 60%;"> <!-- Aspect Ratio Box -->
                       <iframe src="{{ iframe_url }}" 
                               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
                               frameborder="0" 
                               marginheight="0" 
-                              marginwidth="0" 
-                              scrolling="no">
+                              marginwidth="0" >
                       </iframe>
               </div>
             </div>
@@ -203,6 +202,10 @@ Map
 
         .table td:last-child {
             width: 60px; /* Adjust the width of the first column */
+        }
+
+        .responsive-iframe {
+          padding-top: 180%;
         }
     }
 
